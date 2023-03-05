@@ -313,15 +313,15 @@ class Graph:
             f.put(src, 0)
     
             while not f.empty() : 
-                (u,d)=f.get()
+                u=f.get()
                 marquage[u-1]=True
                 for voisin in self.graph[u] :
                     (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
                     if not (marquage[i-1]) and j<=power and (dist[i-1]==-1 or dist[i-1]>d+k):
                         marquage[i-1]=True
                         pred[i-1]=u
-                        dist[i-1]=d+k
-                        f.put(i, d+k)
+                        dist[i-1]=dist[u-1]+k
+                        f.put(i, dist[u-1]+k)
                 
         
             if marquage[dest-1]==False :
@@ -454,21 +454,20 @@ def graph_from_file(filename):
 
 import graphviz
 
-#def represente(G) :
- #   g=graphviz.Graph( format='png', directory="delivery_network", engine='dot')
-  #  gf=open(G)
-  #  gf.readline()
-   # gf=gf.readlines()
-  #  for i in range(0,len(gf)) :
-  #      gf[i]=gf[i].split()
-  #      g.edge(gf[i][0], gf[i][1])
-  #  g.render()
-
 def represente(G) :
-    graph G {a--b}
+    g=graphviz.Graph(filename='G', format='png', directory="delivery_network", engine='dot')
+    gf=open(G, "r")
+    gf.readline()
+    gf=gf.readlines()
+    for i in range(0,len(gf)) :
+         gf[i]=gf[i].split()
+         g.edge(gf[i][0], gf[i][1])
+    g.render()
+
+
 
 G="input/network.00.in"
-#represente(G)
+represente(G)
 #mettre des couleurs dans la 7
 
 
