@@ -3,33 +3,20 @@ import queue
 class Graph:
 
     """
-
     A class representing graphs as adjacency lists and implementing various algorithms on the graphs. Graphs in the class are not oriented. 
-
     Attributes: 
-
     -----------
 
     nodes: NodeType
-
         A list of nodes. Nodes can be of any immutable type, e.g., integer, float, or string.
-
         We will usually use a list of integers 1, ..., n.
-
     graph: dict
-
         A dictionnary that contains the adjacency list of each node in the form
-
         graph[node] = [(neighbor1, p1, d1), (neighbor1, p1, d1), ...]
-
         where p1 is the minimal power on the edge (node, neighbor1) and d1 is the distance on the edge
-
     nb_nodes: int
-
         The number of nodes.
-
     nb_edges: int
-
         The number of edges. 
 
     """
@@ -37,7 +24,6 @@ class Graph:
 
 
     def __init__(self, nodes=[]):
-
         """
 
         Initializes the graph with a set of nodes, and no edges. 
@@ -53,11 +39,8 @@ class Graph:
         """
 
         self.nodes = nodes #etiquettes du graphe
-
         self.graph = dict([(n, []) for n in nodes]) #on représente le graphe par une liste d'adjacence : à chaque noeud on associesa liste qui contient les noeuds avec lesquels il est connecté et distance
-
         self.nb_nodes = len(nodes)
-
         self.nb_edges = 0 #arrete
 
     
@@ -65,33 +48,22 @@ class Graph:
 
 
     def __str__(self):
-
         """Prints the graph as a list of neighbors for each node (one per line)"""
-
         if not self.graph:
-
-            output = "The graph is empty"            
+            output = "The graph is empty"          
 
         else:
-
             output = f"The graph has {self.nb_nodes} nodes and {self.nb_edges} edges.\n"
-
             for source, destination in self.graph.items():
-
                 output += f"{source}-->{destination}\n"
-
         return output
 
     
 
     def add_edge(self, node1, node2, power_min, dist=1):
-
         """
 
-        Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes. 
-
-
-
+        Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes.
         Parameters: 
 
         -----------
@@ -115,27 +87,16 @@ class Graph:
         """
 
         if node1 not in self.graph :
-
             self.graph[node1]=[]
-
             self.nb_nodes +=1
-
             self.nodes.append(node1)
-
         if  node2 not in self.graph :
-
             self.graph[node2]=[]
-
             self.nb_nodes +=1
-
-            self.nodes.append(node2)
-
-        
+            self.nodes.append(node2)      
 
         self.graph[node1].append((node2, power_min, dist))
-
         self.graph[node2].append((node1, power_min,dist))
-
         self.nb_edges += 1
 
 
@@ -191,37 +152,22 @@ class Graph:
     def connected_components(self):
 
         comp_connexe=[]
-
         marquage = [False for i in range(0,self.nb_nodes)]
-
        
 
         def dfs_rec(s) :
-
             comp=[s]
-
             marquage[s-1]=True
-
             for i in self.graph[s] :
-
                 i=i[0]
-
                 if marquage[i-1]==False :
-
                     marquage[i-1]=True
-
                     comp+=dfs_rec(i)
-
-            return comp           
-
-        
+            return comp               
 
         for noeud in self.nodes :
-
             if marquage[noeud-1]==False :
-
                 comp_connexe.append(dfs_rec(noeud))
-
         return comp_connexe
 
         
@@ -454,22 +400,56 @@ def graph_from_file(filename):
 
 import graphviz
 
-def represente(G) :
+def represente(G, src, dest, power=1) :
+    graphe=graph_from_file(G)
     g=graphviz.Graph(filename='G', format='png', directory="delivery_network", engine='dot')
+    chemin=graphe.get_path_with_power(src, dest, power )
     gf=open(G, "r")
     gf.readline()
     gf=gf.readlines()
     for i in range(0,len(gf)) :
-         gf[i]=gf[i].split()
-         g.edge(gf[i][0], gf[i][1])
+         
+        gf[i]=gf[i].split()
+        if chemin != None and int(gf[i][0]) in chemin and int(gf[i][1]) in chemin :
+            g.edge(gf[i][0], gf[i][1], color="green")
+        else :
+            g.edge(gf[i][0], gf[i][1])
     g.render()
 
 
 
 G="input/network.00.in"
-represente(G)
+represente(G, 1, 2)
 #mettre des couleurs dans la 7
 
 
 #grosse erreur à corriger
-#question 5 dijkstra
+import time
+import math
+import random
+##tp2
+def temps(trajets,G, n=2) :
+    G=graph_from_file(G)
+    trajets=open(trajets)
+    line=trajets.readline().split()
+    nb=int(line[0])
+    temps=[]
+    i=0
+    while i<=n :
+        traj=random.randint(1,nb)
+        for k in range(0, traj-1) :
+            trajets.readline()
+        line=trajets.readline().split()
+        (src, dest)=(int(line[0]),int(line[1]))           
+        t0=time.perf_counter()
+        G.min_power(src, dest)
+        t=time.perf_counter()-t0
+        temps.append(t)
+        i+=1
+    return mean(temps)*math.comb(nb_nodes, 2)
+    
+temps("input/routes.9.in","input/network.8.in" )
+
+def algo_kruskal(g) :
+    
+    
