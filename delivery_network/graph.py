@@ -1,5 +1,7 @@
 import numpy as np
 import queue
+import sys
+sys.setrecursionlimit(100000)
 class Graph:
 
     """
@@ -110,11 +112,11 @@ class Graph:
         #manque la com:plexité
         marquage = [False for i in range(self.nb_nodes)]
         pred=[-1 for i in range(self.nb_nodes) ]
-        def dfs_rec(s) :         
-
+        def dfs_rec(s) :
+            
             marquage[s-1]=True
             for voisin in self.graph[s] :
-                (i,j,k)=voisin #i : noeud voisin, j puissance minimal, k distance
+                (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
                 if not (marquage[i-1]) and j<=power :
                     marquage[i-1]=True
                     pred[i-1]=s
@@ -128,10 +130,11 @@ class Graph:
             p=pred[p-1]
             chemin.append(p)
         n=len(chemin)
-        for i in range(n//2) :        
-
+        for i in range(n//2) :
+            
             chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
         return chemin
+                       
 
                        
 
@@ -201,49 +204,30 @@ class Graph:
         """
 
         #il faut trouver une puissance qui marche
-
         #on teste avec des 2**n pour limiter la complexité
-
         #deja il faut voir si un chemin existe 
-
         #ou bien puissance infinie ou bien meme composante connexes
-
         power=float("inf")
 
         if self.get_path_with_power(src, dest, power) == None :
-
             return None #pas de chemin possible
-
         else :
-
             #il existe un chemin et une puissance minimale
-
             #on cherche alors une puissance et un entier n tel que 2**n marche, on sait alors que p min sera entre 2**n-1 et 2**n
 
             n=0
-
             while self.get_path_with_power(src, dest, 2**n) == None :
-
                 n+=1
-
             #on fait la dico
 
             a=2**(n-1)
-
             b=2**n
-
             while b-a>1 :
-
                 m=(a+b)//2
-
                 if self.get_path_with_power(src, dest, m) == None :
-
                     a=m
-
                 else :
-
                     b=m
-
         return (self.get_path_with_power(src, dest, b),b)
 
 
@@ -282,11 +266,28 @@ class Graph:
 
                 chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
             return chemin
+    def pas_cycle(self, arrete) :
+        comp=self.connected_components()
+        (a,b,c)=(arrete)
+        for i in comp :
+            if a in i and b in i :
+                return False
+        return True
 
-
-
-
-
+    def kruskal(self) :
+        dico=self.graph
+        n=len(dico)
+        #trier en fonction de key sorted
+        Gf=Graph([k in range(0,self.nb_nodes)])
+        liste_arrete=[]
+        for i in range (self.nb_nodes) :
+            for (a,b) in self.nb_nodes :
+                liste_arrete.append((i,a,b))
+        liste_arrete=sorted(liste_arrete, key=lambda x : x[2])
+        for arrete in liste_arrete :
+            if Gf.pas_cycle(arrete) :
+                Gf.add_edge(i, a, b)
+        return Gf
 
 
 def graph_from_file(filename):
@@ -413,13 +414,10 @@ def represente(G, src, dest, power=1) :
         if chemin != None and int(gf[i][0]) in chemin and int(gf[i][1]) in chemin :
             g.edge(gf[i][0], gf[i][1], color="green")
         else :
-            g.edge(gf[i][0], gf[i][1])
+            g.edge(gf[i][0], gf[i][1], color="red")
     g.render()
 
 
-
-G="input/network.00.in"
-represente(G, 1, 2)
 #mettre des couleurs dans la 7
 
 
@@ -427,29 +425,12 @@ represente(G, 1, 2)
 import time
 import math
 import random
-##tp2
-def temps(trajets,G, n=2) :
-    G=graph_from_file(G)
-    trajets=open(trajets)
-    line=trajets.readline().split()
-    nb=int(line[0])
-    temps=[]
-    i=0
-    while i<=n :
-        traj=random.randint(1,nb)
-        for k in range(0, traj-1) :
-            trajets.readline()
-        line=trajets.readline().split()
-        (src, dest)=(int(line[0]),int(line[1]))           
-        t0=time.perf_counter()
-        G.min_power(src, dest)
-        t=time.perf_counter()-t0
-        temps.append(t)
-        i+=1
-    return mean(temps)*math.comb(nb_nodes, 2)
-    
-temps("input/routes.9.in","input/network.8.in" )
++
 
-def algo_kruskal(g) :
-    
-    
+#pour les tests soit on fait des nv graphes qui appoprtent des trucs soit on fait de nv tests
+#def algo_kruskal(g) :
+
+
+
+def test_kruskal() :
+    G=Graph([k for k in range (5)])
