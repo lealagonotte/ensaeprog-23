@@ -278,13 +278,17 @@ class Graph:
         dico=self.graph
         n=len(dico)
         #trier en fonction de key sorted
-        Gf=Graph([k in range(0,self.nb_nodes)])
+        Gf=Graph([k for k in range(0,self.nb_nodes)])
         liste_arrete=[]
         for i in range (self.nb_nodes) :
-            for (a,b) in self.nb_nodes :
-                liste_arrete.append((i,a,b))
+            for d in dico[i] :
+                (a,b,c)=d
+                if i< a :
+                    liste_arrete.append((i,a,b))
+        print(liste_arrete)
         liste_arrete=sorted(liste_arrete, key=lambda x : x[2])
         for arrete in liste_arrete :
+            (i,a,b)=arrete
             if Gf.pas_cycle(arrete) :
                 Gf.add_edge(i, a, b)
         return Gf
@@ -425,7 +429,7 @@ def represente(G, src, dest, power=1) :
 import time
 import math
 import random
-+
+
 
 #pour les tests soit on fait des nv graphes qui appoprtent des trucs soit on fait de nv tests
 #def algo_kruskal(g) :
@@ -434,3 +438,16 @@ import random
 
 def test_kruskal() :
     G=Graph([k for k in range (5)])
+    for k in range(5) :
+        G.add_edge(k, k+1, k)
+    G.add_edge(5, 0, 5)
+    print (G)
+    return(G.kruskal())
+def power_min_kruskal(G, src, dest) :
+    #renvoie puissance minimale et chemin associé
+    g=kruskal(G) #on prend l'arbre couvrant associé
+    g.min_power(src, dest)
+
+
+
+

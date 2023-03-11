@@ -1,5 +1,5 @@
 
-from graph import Graph, graph_from_file, temps_exec
+from graph import Graph, graph_from_file,  test_kruskal
 
 
 data_path = "input/"
@@ -51,7 +51,7 @@ def temps_exec_verif_1(G1, trajet, n=15) :
     trajets.close()  
     print(t)  
 
-temps_exec("input/network.2.in", "input/routes.2.in")
+#temps_exec("input/network.2.in", "input/routes.2.in")
 #G="input/network.00.in"
 #represente(G, 1, 2)
 
@@ -79,3 +79,5 @@ def test(trajet="input/routes.1.in", n=140) :
 
     return None
 #test()
+print(test_kruskal())
+
