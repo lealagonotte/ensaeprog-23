@@ -266,7 +266,7 @@ class Graph:
     def kruskal(self) :
         """Renvoie un arbre couvrant de poids minimal de self"""
         #on utilise la structure unionfind
-        uf=UnionFind(self.nb_nodes-1) #créationd'une structure Union Find
+        uf=UnionFind(self.nb_nodes) #créationd'une structure Union Find
         dico=self.graph             
         Gf=Graph([k for k in range(1,self.nb_nodes)]) #on crée notre nouvea graphe
         liste_arrete=[] #on va stocker toutes les listes d'arrêtes dans un tableau
@@ -443,7 +443,6 @@ def temps_exec_kruskal(G1, trajet, n=15) :
     #même principe que pour temps_calcul_naif sauf qu'on passe par l'arbre de Kruskal
     g=graph_from_file(G1)
     G=g.kruskal() #on prend l'arbre de Kruskal
-    print(G)
     trajets=open(trajet)
     line=trajets.readline().split()
     nb=int(line[0])
@@ -461,7 +460,6 @@ def temps_exec_kruskal(G1, trajet, n=15) :
         power_min_kruskal(G,src, dest)
         t=time.perf_counter()-t0
         moy+=t
-        print(moy)
         i+=1
         trajets.close()  
     print((moy/n)*float(nb)) 

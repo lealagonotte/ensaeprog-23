@@ -16,7 +16,7 @@ from graph import Graph, graph_from_file, temps_calcul_naif, test_kruskal, temps
 #Si on prend la route 2 et le graphe 2, on voit que le temps nécessaire est entre 30h et 50h. C'est beaucoup trop long!!
 
 ##question 5 du tp2##
-temps_exec_kruskal("input/network.1.in", "input/routes.1.in")
+temps_exec_kruskal("input/network.2.in", "input/routes.2.in")
 
 
 
