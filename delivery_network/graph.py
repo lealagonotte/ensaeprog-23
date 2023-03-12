@@ -1,9 +1,12 @@
+
+#cette classe UnionFind nous sera utile dans le td2, pour la question 3
+#elle sert à manipuler les composantes connexes efficacement et facilement
 class UnionFind(object):
     '''UnionFind Python class.'''
     def __init__(self, n):
-        assert n > 0, "n must be strictly positive"
+        assert n > 0, "n doit être strictement positif"
         self.n = n
-        # every node is it's own parent in the beginning
+        # cahque sommet est son propre parent au début
         self.parent = [i for i in range(n)]
     
     def find(self, i):
@@ -265,10 +268,10 @@ class Graph:
 
     def kruskal(self) :
         """Renvoie un arbre couvrant de poids minimal de self"""
-        #on utilise la structure unionfind
+        #on utilise la class unionfind qui se trouve au début de la page
         uf=UnionFind(self.nb_nodes) #créationd'une structure Union Find
         dico=self.graph             
-        Gf=Graph([k for k in range(1,self.nb_nodes)]) #on crée notre nouvea graphe
+        Gf=Graph([k for k in range(1,self.nb_nodes)]) #on crée notre nouveau graphe
         liste_arrete=[] #on va stocker toutes les listes d'arrêtes dans un tableau
         for i in range (1,self.nb_nodes) :
             for d in dico[i] : #on parcourt chaque liste associée au sommet i
@@ -279,10 +282,17 @@ class Graph:
         liste_arrete=sorted(liste_arrete, key=lambda x : x[2]) #on trie la liste des arrêtes en fonction de leur power
         for arrete in liste_arrete :
             (i,a,b)=arrete
-            if not uf.is_connected(i-1,a-1) :
-                Gf.add_edge(i, a, b)
-                uf.union(i-1,a-1)
+            #On ne crée pas de cycles en rajoutant l'arrete (s1,s2) lorsque les deux sommets s1 et s2 ne sont pas dans la même composante connexe
+            #si ils sont dans la même composante connexe alors en rajoutant l'arrête, on crée un cycle car alors deux chemins joignent ces sommets
+            if not uf.is_connected(i-1,a-1) : #si i et a ne sont pas dans les mêmes composantes connexes
+                Gf.add_edge(i, a, b) #on rajoute l'arrête dans le nouveau graphe
+                uf.union(i-1,a-1) # les deux sommets i et a sont maintenant dans la même composante connexe
         return Gf
+    #complexité de Kruskal :
+    #On fait une première boucle pour créer liste_arrete, la complexité est en O(nb_nodes)
+    #Ensuite, on trie la liste, dans le meilleur des cas la complexité sera en O(nlog(n)) avec n le nombre d'arrete du graphe
+    #Enfin, on fait une boucle. Il y a n tours. Chaque tour de boucle a une complexité constante car add_edge se fait en temps constant, de meme que union et is_connected avec la structure Union find
+    #POur conclure, la complexité de la fonction est O(nb_nodes + nb_edges(log(nb_edges)))
 
 
 
@@ -434,13 +444,13 @@ def power_min_kruskal(g, src, dest) :
         chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
     return (chemin, power_min)
 
-def temps_exec_kruskal(G1, trajet, n=15) :
+def temps_calcul_kruskal(G1, trajet, n=15) :
     """Renvoie le temps nécessaire pour calculer la puissance minimale sur l'ensemble des trajets en utilisant l'algorithme de Kruskal.
     Pramamètres :
     -G1 : type str, nom du fichier du graphe
     -trajet : type str, nom du fichier où on pioche les trajets
     -n : indique le nombre de trajets où l'on fait réellement le calcul"""
-    #même principe que pour temps_calcul_naif sauf qu'on passe par l'arbre de Kruskal
+    #même principe que pour temps_calcul_naif sauf qu'on passe par l'arbre de Kruskal, pour les explications voir au-dessus
     g=graph_from_file(G1)
     G=g.kruskal() #on prend l'arbre de Kruskal
     trajets=open(trajet)
@@ -462,10 +472,13 @@ def temps_exec_kruskal(G1, trajet, n=15) :
         moy+=t
         i+=1
         trajets.close()  
-    print((moy/n)*float(nb)) 
+   
     return((moy/n)*float(nb))
 
-
+#la complexité de kruskal est O(nb_nodes + nb_edges(log(nb_edges)))
+#on a une boucle while qui fait n tours
+#Chaque tour a une complexité en O(1)
+#La complexité totale est donc O(nb_nodes + nb_edges(log(nb_edges))) car n <<nb_nodes et << nb_edges
 
 ##Tests##
 #Ici, se trouvent tous les tests
@@ -478,4 +491,4 @@ def test_kruskal() :
     G.add_edge(5, 1, 5)
     
     return(G.kruskal())
-#Le résultat obtenu est bien le graphe qu'on voulait avoir
+#Le résultat obtenu est bien le graphe qu'on voulait avoir 

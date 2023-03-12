@@ -1,5 +1,5 @@
 
-from graph import Graph, graph_from_file, temps_calcul_naif, test_kruskal, temps_exec_kruskal, power_min_kruskal
+from graph import Graph, graph_from_file, temps_calcul_naif, test_kruskal, temps_calcul_kruskal, power_min_kruskal
 
 ##test de la question 7##
 
@@ -16,7 +16,21 @@ from graph import Graph, graph_from_file, temps_calcul_naif, test_kruskal, temps
 #Si on prend la route 2 et le graphe 2, on voit que le temps nécessaire est entre 30h et 50h. C'est beaucoup trop long!!
 
 ##question 5 du tp2##
-temps_exec_kruskal("input/network.2.in", "input/routes.2.in")
+#print(temps_calcul_kruskal("input/network.1.in", "input/routes.1.in"))
+#print(temps_calcul_kruskal("input/network.2.in", "input/routes.2.in"))
+#print(temps_calcul_kruskal("input/network.3.in", "input/routes.3.in"))
+#print(temps_calcul_kruskal("input/network.4.in", "input/routes.4.in"))
+#print(temps_calcul_kruskal("input/network.5.in", "input/routes.5.in"))
+#print(temps_calcul_kruskal("input/network.6.in", "input/routes.6.in"))
+#print(temps_calcul_kruskal("input/network.7.in", "input/routes.7.in"))
+#print(temps_calcul_kruskal("input/network.8.in", "input/routes.8.in"))
+#print(temps_calcul_kruskal("input/network.9.in", "input/routes.9.in"))
+#on trouve des temps beaucoup plus courts. Par exemple pour le premier, on trouve 0.002 sec
+#pour le second, on trouve environ 3h
+#pour le troisième, on trouve environ 20h
+#pour le dernier, on trouve environ 50h
+#on trouve donc des temps bien plus courts!!
+
 
 
 
