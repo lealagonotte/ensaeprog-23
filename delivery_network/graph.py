@@ -1,4 +1,8 @@
 import queue
+import time
+import math
+import random
+import graphviz
 import sys
 sys.setrecursionlimit(100000)
 
@@ -219,6 +223,7 @@ class Graph:
 
                 chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
             return chemin
+##Question 2 du td 2##
 
     def pas_cycle(self, arrete) :
         comp=self.connected_components()
@@ -229,10 +234,9 @@ class Graph:
         return True
 
     def kruskal(self) :
-        dico=self.graph
-       
-        #trier en fonction de key sorted
-        Gf=Graph([k for k in range(1,self.nb_nodes)])
+        
+        dico=self.graph             
+        Gf=Graph([k for k in range(1,self.nb_nodes)]) #on crée notre nouvea graphe
         liste_arrete=[]
         for i in range (1,self.nb_nodes) :
             for d in dico[i] :
@@ -253,223 +257,159 @@ class Graph:
 def graph_from_file(filename):
 
     """
-
     Reads a text file and returns the graph as an object of the Graph class.
-
-
-
     The file should have the following format: 
-
         The first line of the file is 'n m'
-
         The next m lines have 'node1 node2 power_min dist' or 'node1 node2 power_min' (if dist is missing, it will be set to 1 by default)
-
         The nodes (node1, node2) should be named 1..n
-
         All values are integers.
-
-
-
-    Parameters: 
-
+        Parameters: 
     -----------
-
     filename: str
-
         The name of the file
-
-
-
     Outputs: 
-
     -----------
-
     G: Graph
-
         An object of the class Graph with the graph from file_name.
-
     """
-
-    f=open(filename)
-
-    ligne=f.readline().split()
-
-    nb_nodes=int(ligne[0])
-
+    f=open(filename) #on ouvre le fichier qui s'appelle f
+    ligne=f.readline().split() #on lit la première ligne, split permet d'avoir une liste de str
+    #on sait que les éléments de la première ligne correspondent à nb_nodes et nb_edges
+    nb_nodes=int(ligne[0]) 
     nb_edges=int(ligne[1])
-
     nodes=[i for i in range(1, nb_nodes +1)]
-
-    G=Graph(nodes)
-
+    G=Graph(nodes) #on crée le graphe associé
+    #on va lire les lignes et ajouter les arrêtes au fur et à mesure
     for i in range(nb_edges) :
-
-        line=f.readline().split()
-
+        line=f.readline().split() #on lit la ligne
+        #on crée les arrêtes
         if len(line) == 4 :
-
             G.add_edge(int(line[0]), int(line[1]), int(line[2]), int(line[3]))
-
         else : 
-
             G.add_edge(int(line[0]), int(line[1]), int(line[2]), 1)
-
-    f.close()
-
+        #si il n'y a pas de 4ème élément dans la ligne, on met une distance égal à 1 par défaut
+    f.close() #on ferme le fichier
     return G    
 
-
+#version du corrigé
 
 #with open(filename, "r") as file:
-
        # n, m = map(int, file.readline().split())
-
        # g = Graph(range(1, n+1))
-
        # for _ in range(m):
-
           #  edge = list(map(int, file.readline().split()))
-
           #  if len(edge) == 3:
-
           #      node1, node2, power_min = edge
-
            #     g.add_edge(node1, node2, power_min) # will add dist=1 by default
-
           # elif len(edge) == 4:
-
             #    node1, node2, power_min, dist = edge
-
              #   g.add_edge(node1, node2, power_min, dist)
-
             #else:
-
               #  raise Exception("Format incorrect")
-
     #return g
 
- 
+##Question 7##
 
-
-
-
-
-#cout(n,m)=O(n+m), m sommets  n arretes complexité truc
-
-
-
-
-import graphviz
-
-def represente(G, src, dest, power=1) :
-    graphe=graph_from_file(G)
-    g=graphviz.Graph(filename='G', format='png', directory="delivery_network", engine='dot')
-    chemin=graphe.get_path_with_power(src, dest, power )
-    gf=open(G, "r")
-    gf.readline()
-    gf=gf.readlines()
+def represente(G, src, dest, power=20) :
+    """Résultat : Crée une image PNG qui est une représentation graphique du graphe de G, ainsi que du chemin associé trouvé"""
+    graphe=graph_from_file(G) #on crée le graphe avec la class Graph associé à G
+    g=graphviz.Graph(filename='G', format='png', directory="delivery_network", engine='dot') #on crée un graphe Graphviz
+    chemin=graphe.get_path_with_power(src, dest, power ) #on trouve un chemin associé à la puissance power,
+    #on aurait pu ne pas mettre power dans les variables et utiliser la fonction min_power
+    gf=open(G, "r") 
+    gf.readline() #on lit la première ligne car elle n'est pas utili
+    gf=gf.readlines() #on lit toutes les lignes
     for i in range(0,len(gf)) :
          
         gf[i]=gf[i].split()
         if chemin != None and int(gf[i][0]) in chemin and int(gf[i][1]) in chemin :
             g.edge(gf[i][0], gf[i][1], color="green")
         else :
-            g.edge(gf[i][0], gf[i][1], color="red")
+            g.edge(gf[i][0], gf[i][1])
+    
+    print(chemin)
+    if chemin is not None : 
+        for node in chemin : 
+            g.node(str(node), color = 'blue')
     g.render()
-
-
-#mettre des couleurs dans la 7
-
-
-#grosse erreur à corriger
-import time
-import math
-import random
-
-
-#pour les tests soit on fait des nv graphes qui appoprtent des trucs soit on fait de nv tests
-#def algo_kruskal(g) :
-
-
-
-def test_kruskal() :
-    G=Graph([k for k in range (1,5)])
-    for k in range(1,5) :
-        G.add_edge(k, k+1, k)
-    G.add_edge(5, 1, 5)
-    print (G)
-    return(G.kruskal())
-def power_min_kruskal(g, src, dest) :
-    #on suppose g est couvrant
-    #renvoie puissance minimale et chemin associé
-   
-        marquage = [False for i in range(self.nb_nodes)]
-        pred=[-1 for i in range(self.nb_nodes) ]
-        def dfs_rec(s) :            
-            marquage[s-1]=True
-            for voisin in self.graph[s] :
-                (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
-                if not (marquage[i-1]) :
-                    marquage[i-1]=True
-                    pred[i-1]=s
-                    dfs_rec(i)
-        dfs_rec(src)
-        if marquage[dest-1]==False :
-            return None
-        chemin = [dest]
-        power_min=0
-        p=dest
-        while p != src :
-            p_old=p
-            p=pred[p-1]
-            chemin.append(p)
-            bool=False
-            i=0
-            while not bool :
-                (n1,n2,power,d)=g.graph[p_old][i]
-                if n1==p :
-                    bool=True
-            power_min=max(power_min, power)
-        n=len(chemin)
-        for i in range(n//2) :
-            
-            chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
-        return (chemin, power_min)
                        
     
-
-def temps_exec(G1, trajet, n=15) :
-    G=graph_from_file(G1)
-    
-    trajets=open(trajet)
-    line=trajets.readline().split()
-    nb=int(line[0])
+##question 1 du td2###
+def temps_calcul_naif(G1, trajet, n=15) :
+    """Renvoie le temps nécessaire pour calculer la puissance minimale sur l'ensemble des trajets.
+    Pramamètres :
+    -G1 : type str, nom du fichier du graphe
+    -trajet : type str, nom du fichier où on pioche les trajets
+    -n : indique le nombre de trajets où l'on fait réellement le calcul"""
+    G=graph_from_file(G1)    #on convertit en Graph G1
+    trajets=open(trajet) #on ouvre le fichier trajet
+    line=trajets.readline().split() #on lit la première ligne
+    nb=int(line[0]) #nb = nombre de trajets dans trajet
+    #initialisation
     moy=0
     i = 0
-    trajets.close()
-
-    while i < n :
+    trajets.close() #on ferme pour recommencer au début
+    while i < n : #on fait le calcul n fois
         trajets=open(trajet)
-
-        traj=random.randint(1,nb)
-        for k in range(0, traj-1) :
-            trajets.readline()
-        
-        line=trajets.readline().split()
-                   
-        (src, dest)=(int(line[0]), int(line[1]))        
-        t0=time.perf_counter()
-        G.min_power(src, dest)
-        t=time.perf_counter()-t0
-        moy+=t
+        traj=random.randint(1,nb) #on tire un nombre aléatoire pour savoir sur quel trajet on fait le calcul
+        for k in range(0, traj-1) : #on avance dans le fichier jusqu'à être à la bonne ligne
+            trajets.readline()        
+        line=trajets.readline().split() #on stocke cette ligne                   
+        (src, dest)=(int(line[0]), int(line[1]))        #on a ainsi src et dest
+        t0=time.perf_counter() #on regarde le temps qu'il est
+        G.min_power(src, dest) #on fait le calcul
+        t=time.perf_counter()-t0 #on regarde le temps qu'on a mis
+        moy+=t #on ajoute à moy ce temps pour trouver la moyenne des temps
         i+=1
-        trajets.close()  
-    print((moy/n)*float(nb)) 
-    return((moy/n)*float(nb))
+        trajets.close()  #on ferme pour reprendre la lecture au début
+    #print((moy/n)*float(nb)) 
+    return((moy/n)*float(nb)) #on retourne le temps moyen*nb de trajet ce qui donne le temps total qu'on mettrait si on faisait le calcul pour tous les trajets
+
+
+##Question 5 du td2##
+
+def power_min_kruskal(g, src, dest) :
+    """Renvoie  pour un trajet t=(src, dest) et g un arbre couvrant, la puissance minimale (et un chemin associé) d'un camion pouvant couvrir ce trajet"""
+    # Prérequis : on suppose g est couvrant de poids minimal. 
+    # Ainsi, si le chemin entre src et dest existe, il est unique
+    #on fait un parcours comme on a déjà fait précedemment
+    marquage = [False for i in range(g.nb_nodes)]
+    pred=[-1 for i in range(g.nb_nodes)]
+    def dfs_rec(s) :            
+        marquage[s-1]=True
+        for voisin in g.graph[s] :
+            (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
+            if not (marquage[i-1]) :
+                marquage[i-1]=True
+                pred[i-1]=(s,j) #on stocke des couples dans le tableau de prédecesseurs pour avoir accès à la puissance de l'arrête (s,i) plus simplement
+                dfs_rec(i)
+    dfs_rec(src)
+    if marquage[dest-1]==False :
+        return None
+    chemin = [dest]
+    #on va calculer la puissance minimale nécessaire.
+    #Pour cela, on construit le chemin pour aller de src à dest et on regarde le power de chaque arrête
+    #la puissance minimale vaut le max de ces puissances    
+    p=dest
+    power_min=0
+    while p != src :
+        (p, power)=pred[p-1] #on prend le couple
+        chemin.append(p)        
+        power_min=max(power_min, power) #on regarde si power > power_min, auquel cas il faut augmenter la puissance minimale pour passer
+    n=len(chemin)
+    for i in range(n//2) :            
+        chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
+    return (chemin, power_min)
 
 def temps_exec_kruskal(G1, trajet, n=15) :
+    """Renvoie le temps nécessaire pour calculer la puissance minimale sur l'ensemble des trajets en utilisant l'algorithme de Kruskal.
+    Pramamètres :
+    -G1 : type str, nom du fichier du graphe
+    -trajet : type str, nom du fichier où on pioche les trajets
+    -n : indique le nombre de trajets où l'on fait réellement le calcul"""
+    #même principe que pour temps_calcul_naif sauf qu'on passe par l'arbre de Kruskal
     g=graph_from_file(G1)
-    G=g.kruskal()
+    G=g.kruskal() #on prend l'arbre de Kruskal
     trajets=open(trajet)
     line=trajets.readline().split()
     nb=int(line[0])
@@ -478,13 +418,10 @@ def temps_exec_kruskal(G1, trajet, n=15) :
     trajets.close()
     while i < n :
         trajets=open(trajet)
-
         traj=random.randint(1,nb)
         for k in range(0, traj-1) :
-            trajets.readline()
-        
-        line=trajets.readline().split()
-                   
+            trajets.readline()        
+        line=trajets.readline().split()                   
         (src, dest)=(int(line[0]), int(line[1]))        
         t0=time.perf_counter()
         power_min_kruskal(G,src, dest)
@@ -494,3 +431,18 @@ def temps_exec_kruskal(G1, trajet, n=15) :
         trajets.close()  
     print((moy/n)*float(nb)) 
     return((moy/n)*float(nb))
+
+
+
+##Tests##
+#Ici, se trouvent tous les tests
+
+def test_kruskal() :
+    """Teste la fonction kruskal avec un graphe qui est un cycle. Le résultat obtenu doit être le même graphe sans la dernière arrête"""
+    G=Graph([k for k in range (1,5)]) 
+    for k in range(1,5) :
+        G.add_edge(k, k+1, k)
+    G.add_edge(5, 1, 5)
+    
+    return(G.kruskal())
+#Le résultat obtenu est bien
