@@ -453,6 +453,7 @@ def temps_calcul_kruskal(G1, trajet, n=15) :
     #même principe que pour temps_calcul_naif sauf qu'on passe par l'arbre de Kruskal, pour les explications voir au-dessus
     g=graph_from_file(G1)
     G=g.kruskal() #on prend l'arbre de Kruskal
+
     trajets=open(trajet)
     line=trajets.readline().split()
     nb=int(line[0])
@@ -475,10 +476,30 @@ def temps_calcul_kruskal(G1, trajet, n=15) :
    
     return((moy/n)*float(nb))
 
-#la complexité de kruskal est O(nb_nodes + nb_edges(log(nb_edges)))
+#la complexité de kruskal est O(nb_nodes + nb_edges(log(nb_edges))) mais on n'en tient pas compte dans la suite
 #on a une boucle while qui fait n tours
-#Chaque tour a une complexité en O(1)
-#La complexité totale est donc O(nb_nodes + nb_edges(log(nb_edges))) car n <<nb_nodes et << nb_edges
+#Chaque tour a une complexité valant celle de power_min_kruskal qui est en O(V+E) mais comme g est couvrant E=V-1
+#donc chaque tour a une complexité en O(V)
+#La complexité totale est donc O(nb_nodes) car n <<nb_nodes et en O(V) par trajet si on ne prend pas en compte la transformation en arbre couvrant
+
+
+def calcul_trajets_total(G1, trajet) :
+    g=graph_from_file(G1)
+    G=g.kruskal() #on prend l'arbre de Kruskal
+
+    trajets=open(trajet)
+    line=trajets.readline().split()
+    nb=int(line[0]) 
+    t0=time.perf_counter()
+    for i in range(0,nb) :           
+        line=trajets.readline().split()                   
+        (src, dest)=(int(line[0]), int(line[1]))       
+        
+        power_min_kruskal(G,src, dest)
+    t=time.perf_counter()-t0        
+    trajets.close()  
+    return t
+
 
 ##Tests##
 #Ici, se trouvent tous les tests

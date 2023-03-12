@@ -1,5 +1,5 @@
 
-from graph import Graph, graph_from_file, temps_calcul_naif, test_kruskal, temps_calcul_kruskal, power_min_kruskal
+from graph import Graph, graph_from_file, temps_calcul_naif, test_kruskal, temps_calcul_kruskal, power_min_kruskal, calcul_trajets_total
 
 ##test de la question 7##
 
@@ -28,10 +28,11 @@ from graph import Graph, graph_from_file, temps_calcul_naif, test_kruskal, temps
 #on trouve des temps beaucoup plus courts. Par exemple pour le premier, on trouve 0.002 sec
 #pour le second, on trouve environ 3h
 #pour le troisième, on trouve environ 20h
-#pour le dernier, on trouve environ 50h
+#pour le 5eme, 7h
+#pour le dernier, on trouve environ 30h
 #on trouve donc des temps bien plus courts!!
 
-
+print(calcul_trajets_total("input/network.2.in", "input/routes.2.in"))
 
 
 #print(test_kruskal())
