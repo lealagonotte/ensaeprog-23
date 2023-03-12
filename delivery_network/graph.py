@@ -1,3 +1,39 @@
+class UnionFind(object):
+    '''UnionFind Python class.'''
+    def __init__(self, n):
+        assert n > 0, "n must be strictly positive"
+        self.n = n
+        # every node is it's own parent in the beginning
+        self.parent = [i for i in range(n)]
+    
+    def find(self, i):
+        '''Find the parent of an element (e.g. the group it belongs to) and compress paths along the way.'''
+        if self.parent[i] != i:
+            # path compression on the way to finding the final parent 
+            # (i.e. the element with a self loop)
+            self.parent[i] = self.find(self.parent[i])
+        return self.parent[i]
+     
+    def is_connected(self, x, y):
+        '''Check whether X and Y are connected, i.e. they have the same parent.'''
+        if self.find(x) == self.find(y):
+            return True
+        else:
+            return False
+    
+    def union(self, x, y):
+        '''Unite the two elements by uniting their parents.'''
+        xparent = self.find(x)
+        yparent = self.find(y)
+        if xparent != yparent:
+            # if these elements are not yet in the same set,
+            # we will set the y parent to the x parent
+            self.parent[yparent]= xparent
+
+
+
+
+
 import queue
 import time
 import math
@@ -225,30 +261,27 @@ class Graph:
             return chemin
 ##Question 2 du td 2##
 
-    def pas_cycle(self, arrete) :
-        comp=self.connected_components()
-        (a,b,c)=(arrete)
-        for i in comp :
-            if a in i and b in i :
-                return False
-        return True
+    
 
     def kruskal(self) :
-        
+        """Renvoie un arbre couvrant de poids minimal de self"""
+        #on utilise la structure unionfind
+        uf=UnionFind(self.nb_nodes-1) #créationd'une structure Union Find
         dico=self.graph             
         Gf=Graph([k for k in range(1,self.nb_nodes)]) #on crée notre nouvea graphe
-        liste_arrete=[]
+        liste_arrete=[] #on va stocker toutes les listes d'arrêtes dans un tableau
         for i in range (1,self.nb_nodes) :
-            for d in dico[i] :
-                (a,b,c)=d
-                if i< a :
+            for d in dico[i] : #on parcourt chaque liste associée au sommet i
+                (a,b,c)=d #a=node2, b=power, c=dist
+                if i< a : #on ajoute les arrêtes seulement une fois dans liste_arrete
                     liste_arrete.append((i,a,b))
         
-        liste_arrete=sorted(liste_arrete, key=lambda x : x[2])
+        liste_arrete=sorted(liste_arrete, key=lambda x : x[2]) #on trie la liste des arrêtes en fonction de leur power
         for arrete in liste_arrete :
             (i,a,b)=arrete
-            if Gf.pas_cycle(arrete) :
+            if not uf.is_connected(i-1,a-1) :
                 Gf.add_edge(i, a, b)
+                uf.union(i-1,a-1)
         return Gf
 
 
@@ -410,6 +443,7 @@ def temps_exec_kruskal(G1, trajet, n=15) :
     #même principe que pour temps_calcul_naif sauf qu'on passe par l'arbre de Kruskal
     g=graph_from_file(G1)
     G=g.kruskal() #on prend l'arbre de Kruskal
+    print(G)
     trajets=open(trajet)
     line=trajets.readline().split()
     nb=int(line[0])
@@ -427,6 +461,7 @@ def temps_exec_kruskal(G1, trajet, n=15) :
         power_min_kruskal(G,src, dest)
         t=time.perf_counter()-t0
         moy+=t
+        print(moy)
         i+=1
         trajets.close()  
     print((moy/n)*float(nb)) 
@@ -445,4 +480,4 @@ def test_kruskal() :
     G.add_edge(5, 1, 5)
     
     return(G.kruskal())
-#Le résultat obtenu est bien
+#Le résultat obtenu est bien le graphe qu'on voulait avoir
