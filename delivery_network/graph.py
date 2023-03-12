@@ -1,4 +1,3 @@
-
 import queue
 import sys
 sys.setrecursionlimit(100000)
@@ -27,7 +26,7 @@ class Graph:
         nodes: list, optional
             A list of nodes. Default is empty.        """
 
-        self.nodes = nodes   #liste des étiquettes du graphe
+        self.nodes = nodes   #liste des sommets du graphe
         self.graph = dict([(n, []) for n in nodes])   #on représente le graphe par une liste d'adjacence : à chaque noeud on associe une liste qui contient les noeuds avec lesquels il est connecté, le power_min et la distance
         self.nb_nodes = len(nodes)
         self.nb_edges = 0    #nombre d'arretes  
@@ -58,7 +57,7 @@ class Graph:
         dist: numeric (int or float), optional
             Distance between node1 and node2 on the edge. Default is 1.
         """
-        #si node1 ou node2 n'est pas dans la liste des étiquettes, on le rajoute. On met à jour la variable self.nb_nodes
+        #si node1 ou node2 n'est pas dans la liste des sommets, on le rajoute. On met à jour la variable self.nb_nodes
         if node1 not in self.graph :
             self.graph[node1]=[]
             self.nb_nodes +=1
@@ -67,12 +66,11 @@ class Graph:
             self.graph[node2]=[]
             self.nb_nodes +=1
             self.nodes.append(node2)      
-#On rajoute la nouvelle arrête du graphe en ajoutant le triplet à la liste associée à l'étiquette node1 puis à l'étiquette node2
+#On rajoute la nouvelle arrête du graphe en ajoutant le triplet à la liste associée à le sommet node1 puis à le sommet node2
         self.graph[node1].append((node2, power_min, dist))
         self.graph[node2].append((node1, power_min,dist))
         #on met à jour le nombre d'arrête
         self.nb_edges += 1  
-
 
     def get_path_with_power(self, src, dest, power):
         """Renvoie un chemin possible entre src et dest si un camion de puissance power peut couvrir le trajet t=(src, dest), 
@@ -117,27 +115,28 @@ class Graph:
 #La complexité est donc O(V+E) avec V le nombre de sommets et E le nombre d'arrêtes de G
 
     def connected_components(self):
-"""Résultat : Renvoie les composantes connexes du graphe"""
+        """Résultat : Renvoie les composantes connexes du graphe"""
 # on fait un parcours en profondeur récursif comme au-dessus
 # on crée la liste qui contiendra les composantes connexes
-        comp_connexe=[] 
-        marquage = [False for i in range(0,self.nb_nodes)] # on procède comme au-dessus       
+        comp_connexe = [] 
+        marquage = [False for i in range(0,self.nb_nodes)]  # on procède comme au-dessus       
 
-        def dfs_rec(s) :
-            comp=[s] #comp sera la liste représentant la classe dont un représentant est s
-            marquage[s-1]=True
-            for i in self.graph[s] : # i est tuple (node2, power, dist)
-                i=i[0] #on veut la deuxième extrémité de l'arrête : elle est dans la composante connexe de s
-                if marquage[i-1]==False :
-                    marquage[i-1]=True
-                    comp+=dfs_rec(i) #on récure pour ajouter tous les sommets tels qu'il existe un chemin entre s et ce sommet
+        def dfs_rec(s):
+            comp = [s]  #comp sera la liste représentant la classe dont un représentant est s
+            marquage[s-1] = True
+            for i in self.graph[s]:  # i est tuple (node2, power, dist)
+                i = i[0]  #on veut la deuxième extrémité de l'arrête : elle est dans la composante connexe de s
+                if not(marquage[i-1]):
+                    marquage[i-1] = True
+                    comp += dfs_rec(i)  #on récure pour ajouter tous les sommets tels qu'il existe un chemin entre s et ce sommet
             return comp    #on renvoie la composante connexe représentée par s          
 # on veut toutes les composantes connexes donc on a fini quand on a parcouru tout le graphe ie tous les sommets sont marqués
         for noeud in self.nodes :
             if marquage[noeud-1]==False :
                 comp_connexe.append(dfs_rec(noeud))
         return comp_connexe    
-#Concernant la complexité, on réalise 
+#Concernant la complexité, au pire on fait nb_sommets parcours en profondeur. Or on a analysé la complexité du parcours ne profondeur au-dessus
+#Ainsi, la complexité au pire est O(V(V+E))
 
     def connected_components_set(self):
         """
@@ -149,60 +148,65 @@ class Graph:
 
     def min_power(self, src, dest):
         """
-        Should return path, min_power.
-        """
-
-        #il faut trouver une puissance qui marche
-        #on teste avec des 2**n pour limiter la complexité
-        #deja il faut voir si un chemin existe 
-        #ou bien puissance infinie ou bien meme composante connexes
+        Résulat : Renvoie la puissance minimale d'un camion pouvant couvrir le trajet (src, dest)
+        Paramètres :
+        Src : sommet duquel on part
+        Dest : sommet auquel on veut arriver        """
+       # on commence par regarder si un chemin existe. 
+       # Pour cela, on regarde si get_path_wit_power renvoie un chemin quand power = +inf.
         power=float("inf")
-
+        # Si elle n'en renvoie pas, alors il n'existe de chemin entre src et dest et donc on ne peut pas trouver de puissance minimale
         if self.get_path_with_power(src, dest, power) == None :
-            return None #pas de chemin possible
+            return None 
         else :
-            #il existe un chemin et une puissance minimale
-            #on cherche alors une puissance et un entier n tel que 2**n marche, on sait alors que p min sera entre 2**n-1 et 2**n
-
+            # Sinon, il existe un chemin et une puissance minimale
+            # on cherche alors une puissance et donc un entier n tel que 2**n convienne 
+            # on sait alors que la puissance minimale sera entre 2**n-1 et 2**n
             n=0
-            while self.get_path_with_power(src, dest, 2**n) == None :
+            while self.get_path_with_power(src, dest, 2**n) == None : #la puissance est trop faible, donc on l'augmente
                 n+=1
-            #on fait la dico
-
+            # On fait une recherche dichotomique entre 2**(n-1) et 2**n
             a=2**(n-1)
             b=2**n
-            while b-a>1 :
+            while b-a>1 : #a et b sont des entiers
                 m=(a+b)//2
-                if self.get_path_with_power(src, dest, m) == None :
+                if self.get_path_with_power(src, dest, m) == None : #si il n'y a pas de chemin pour powe=m, on cherche entre m et b
                     a=m
-                else :
+                else : #Sinon entre a et m
                     b=m
-        return (self.get_path_with_power(src, dest, b),b)
+        # à la fin de la boucle, on a ou bien b=a+1 donc power =b ou bien a=b donc power=b
+        return (self.get_path_with_power(src, dest, b),b) #On renvoie la puissance minimale et le chemin associé à cette puissance
+#Complexité : Pour trouver un n tel que 2**n soit une puissance possible, on a une complexité logarithmique en power_min 
+# en effet : k=2**n equivaut à n=log_2(k)
+#Ensuite, la recherche dichotomique a une complexité en O(log(2**(n-1))=O(n-1)=O(log(k)). 
+#En effet, d=2**n-2**(n-1)=2**(n-1). On divise par 2 la longueur de l'intervalle à chaque tour et 2**(n-1)/2**l=1 équivaut à l*log(2)=(n-1)log(2)
+#donc l=n-1=O(log(k))
+#Conclusion : la complexité est logarithmique en la puissance minimale
 
-
-
+##Question 5##
     def plus_court_chemin(self, src, dest, power) :
-    #on fait une file de priorité
+    #on va utiliser une file de priorité pour sortir d'abord les éléments avec une distance plus petite
+    # on utilise l'algorithme de Dijkstra, qui se rapproche d'un parcours en largeur
             f=queue.PriorityQueue()
-            dist=[-1 for i in range(self.nb_nodes)]
-            marquage = [False for i in range(self.nb_nodes)]
-            pred=[-1 for i in range(self.nb_nodes)] 
+            dist=[-1 for i in range(self.nb_nodes)] #tableau pour stocker les distances
+            marquage = [False for i in range(self.nb_nodes)] #tableau de marquage
+            pred=[-1 for i in range(self.nb_nodes)] #tableau des prédecesseurs
+            #initialisation
             dist[src-1]=0
             marquage[src-1]=True  
             f.put(src, 0)
-    
+        #on continue tant que la file n'est pas vide
             while not f.empty() : 
-                u=f.get()
+                u=f.get() #on sort l'élément avec la plus grande priorité
                 marquage[u-1]=True
                 for voisin in self.graph[u] :
                     (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
-                    if not (marquage[i-1]) and j<=power and (dist[i-1]==-1 or dist[i-1]>d+k):
+                    if not (marquage[i-1]) and j<=power and (dist[i-1]==-1 or dist[i-1]>d+k): #on modifie si la distance est plus petite qu'avant
                         marquage[i-1]=True
                         pred[i-1]=u
                         dist[i-1]=dist[u-1]+k
-                        f.put(i, dist[u-1]+k)
-                
-        
+                        f.put(i, dist[u-1]+k)               
+        #comme dans la question 3, on reconstruit un chemin
             if marquage[dest-1]==False :
                 return None
             chemin = [dest]
@@ -215,6 +219,7 @@ class Graph:
 
                 chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
             return chemin
+
     def pas_cycle(self, arrete) :
         comp=self.connected_components()
         (a,b,c)=(arrete)
@@ -243,6 +248,8 @@ class Graph:
         return Gf
 
 
+
+##question 1##
 def graph_from_file(filename):
 
     """
@@ -487,4 +494,3 @@ def temps_exec_kruskal(G1, trajet, n=15) :
         trajets.close()  
     print((moy/n)*float(nb)) 
     return((moy/n)*float(nb))
-
