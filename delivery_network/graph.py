@@ -470,6 +470,7 @@ def temps_calcul_kruskal(G1, trajet, n=15) :
         t0=time.perf_counter()
         power_min_kruskal(G,src, dest)
         t=time.perf_counter()-t0
+        print(t)
         moy+=t
         i+=1
         trajets.close()  
@@ -507,9 +508,12 @@ def calcul_trajets_total(G1, trajet) :
 def test_kruskal() :
     """Teste la fonction kruskal avec un graphe qui est un cycle. Le résultat obtenu doit être le même graphe sans la dernière arrête"""
     G=Graph([k for k in range (1,5)]) 
+    test=Graph([k for k in range (1,5)])
     for k in range(1,5) :
         G.add_edge(k, k+1, k)
+        test.add_edge(k,k+1,k)
     G.add_edge(5, 1, 5)
-    
-    return(G.kruskal())
+    print(G.kruskal())
+    print(test)
+    return(None)
 #Le résultat obtenu est bien le graphe qu'on voulait avoir 
