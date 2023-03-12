@@ -1,11 +1,11 @@
-import numpy as np
+
 import queue
 import sys
 sys.setrecursionlimit(100000)
-class Graph:
 
-    """
-    A class representing graphs as adjacency lists and implementing various algorithms on the graphs. Graphs in the class are not oriented. 
+
+class Graph:
+    """    A class representing graphs as adjacency lists and implementing various algorithms on the graphs. Graphs in the class are not oriented. 
     Attributes: 
     -----------
 
@@ -19,36 +19,20 @@ class Graph:
     nb_nodes: int
         The number of nodes.
     nb_edges: int
-        The number of edges. 
-
-    """
-
-
-
+        The number of edges.    """
     def __init__(self, nodes=[]):
-        """
-
-        Initializes the graph with a set of nodes, and no edges. 
-
+        """       Initializes the graph with a set of nodes, and no edges. 
         Parameters: 
-
         -----------
-
         nodes: list, optional
+            A list of nodes. Default is empty.        """
 
-            A list of nodes. Default is empty.
-
-        """
-
-        self.nodes = nodes #etiquettes du graphe
-        self.graph = dict([(n, []) for n in nodes]) #on représente le graphe par une liste d'adjacence : à chaque noeud on associesa liste qui contient les noeuds avec lesquels il est connecté et distance
+        self.nodes = nodes   #liste des étiquettes du graphe
+        self.graph = dict([(n, []) for n in nodes])   #on représente le graphe par une liste d'adjacence : à chaque noeud on associe une liste qui contient les noeuds avec lesquels il est connecté, le power_min et la distance
         self.nb_nodes = len(nodes)
-        self.nb_edges = 0 #arrete
+        self.nb_edges = 0    #nombre d'arretes  
 
     
-
-
-
     def __str__(self):
         """Prints the graph as a list of neighbors for each node (one per line)"""
         if not self.graph:
@@ -58,36 +42,23 @@ class Graph:
             output = f"The graph has {self.nb_nodes} nodes and {self.nb_edges} edges.\n"
             for source, destination in self.graph.items():
                 output += f"{source}-->{destination}\n"
-        return output
+        return output    
 
-    
-
+   
     def add_edge(self, node1, node2, power_min, dist=1):
-        """
-
-        Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes.
+        """        Adds an edge to the graph. Graphs are not oriented, hence an edge is added to the adjacency list of both end nodes.
         Parameters: 
-
-        -----------
-
+                ----------
         node1: NodeType
-
             First end (node) of the edge
-
         node2: NodeType
-
             Second end (node) of the edge
-
         power_min: numeric (int or float)
-
             Minimum power on this edge
-
         dist: numeric (int or float), optional
-
             Distance between node1 and node2 on the edge. Default is 1.
-
         """
-
+        #si node1 ou node2 n'est pas dans la liste des étiquettes, on le rajoute. On met à jour la variable self.nb_nodes
         if node1 not in self.graph :
             self.graph[node1]=[]
             self.nb_nodes +=1
@@ -96,111 +67,89 @@ class Graph:
             self.graph[node2]=[]
             self.nb_nodes +=1
             self.nodes.append(node2)      
-
+#On rajoute la nouvelle arrête du graphe en ajoutant le triplet à la liste associée à l'étiquette node1 puis à l'étiquette node2
         self.graph[node1].append((node2, power_min, dist))
         self.graph[node2].append((node1, power_min,dist))
-        self.nb_edges += 1
-
-
-
-    
-
+        #on met à jour le nombre d'arrête
+        self.nb_edges += 1  
 
 
     def get_path_with_power(self, src, dest, power):
-        #on fait un parcours en profondeur, on regarde si les étiquettes sont bien toutes plus petites que power
-        #manque la com:plexité
-        marquage = [False for i in range(self.nb_nodes)]
-        pred=[-1 for i in range(self.nb_nodes) ]
-        def dfs_rec(s) :
-            
-            marquage[s-1]=True
-            for voisin in self.graph[s] :
-                (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
-                if not (marquage[i-1]) and j<=power :
-                    marquage[i-1]=True
-                    pred[i-1]=s
-                    dfs_rec(i)
-        dfs_rec(src)
-        if marquage[dest-1]==False :
+        """Renvoie un chemin possible entre src et dest si un camion de puissance power peut couvrir le trajet t=(src, dest), 
+        None si ce n'est pas possible
+        Paramètres : 
+        -src : ville (étiquette) de laquelle on part
+        -dest : ville (étiquette) vers laquelle on veut aller
+        -power : puissance du camion qui veut réaliser ce trajet """
+
+        #On fait un parcours en profondeur récursif 
+        marquage = [False for i in range(self.nb_nodes)]   #on marque les sommets que l'on visite
+        #initialement, on n'en a visité aucun
+        pred = [-1 for i in range(self.nb_nodes)]   #le tableau des prédecesseurs sert à savoir par quel sommet on est passé juste avant 
+        #il sera utile pour reconstruire le chemin par lequel on est passé
+        def dfs_rec(s):
+        #  on fait une fonction intermédiaire pour le parcours récursif  
+            marquage[s-1]=True   #on marque le sommet s : on l'a visité
+            for voisin in self.graph[s]: #on regarde les voisins de s
+                (i, j, k)=voisin  #i : noeud voisin, j puissance minimale pour passer par l'arrête (s,i), k distance
+                if not (marquage[i-1]) and j <= power:  #si on n'a pas déjà visité i et que le camion peut passer
+                    marquage[i-1] = True
+                    pred[i-1] = s  #le prédecesseur de i est s
+                    dfs_rec(i)  #on récure
+        dfs_rec(src)  #on fait le parcours à partir de la source
+        if marquage[dest-1]==False :  #on n'a pas visité dest donc le chemin n'existe pas
             return None
+#on utilise le tableau de prédecesseur pour reconstruire le chemin
         chemin = [dest]
-        p=dest
-        while p != src :
-            p=pred[p-1]
+        p = dest
+        while p != src:
+            p = pred[p-1]
             chemin.append(p)
-        n=len(chemin)
-        for i in range(n//2) :
-            
-            chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
-        return chemin
-                       
-
-                       
-
-  
-
-        
-
-                
-
-
-
-        
-
-    
-
-
+        n = len(chemin)
+        #le chemin est à l'envers donc on le retourne
+        for i in range(n//2):            
+            chemin[i], chemin[n-1-i] = chemin[n-1-i], chemin[i]
+        return chemin                                
+# complexité de l'algorithme : 
+# la complexité est celle d'un parcours en profondeur 
+# Grâce au marquage, on passe au plus 1 fois par chaque sommet. 
+# Pour chaque sommet, on a une boucle for : on fait le nombre d'arrêtes dans lesquelles s est une extremité
+#La complexité est donc O(V+E) avec V le nombre de sommets et E le nombre d'arrêtes de G
 
     def connected_components(self):
-
-        comp_connexe=[]
-        marquage = [False for i in range(0,self.nb_nodes)]
-       
+"""Résultat : Renvoie les composantes connexes du graphe"""
+# on fait un parcours en profondeur récursif comme au-dessus
+# on crée la liste qui contiendra les composantes connexes
+        comp_connexe=[] 
+        marquage = [False for i in range(0,self.nb_nodes)] # on procède comme au-dessus       
 
         def dfs_rec(s) :
-            comp=[s]
+            comp=[s] #comp sera la liste représentant la classe dont un représentant est s
             marquage[s-1]=True
-            for i in self.graph[s] :
-                i=i[0]
+            for i in self.graph[s] : # i est tuple (node2, power, dist)
+                i=i[0] #on veut la deuxième extrémité de l'arrête : elle est dans la composante connexe de s
                 if marquage[i-1]==False :
                     marquage[i-1]=True
-                    comp+=dfs_rec(i)
-            return comp               
-
+                    comp+=dfs_rec(i) #on récure pour ajouter tous les sommets tels qu'il existe un chemin entre s et ce sommet
+            return comp    #on renvoie la composante connexe représentée par s          
+# on veut toutes les composantes connexes donc on a fini quand on a parcouru tout le graphe ie tous les sommets sont marqués
         for noeud in self.nodes :
             if marquage[noeud-1]==False :
                 comp_connexe.append(dfs_rec(noeud))
-        return comp_connexe
-
-        
-
-
-
-
-
-
+        return comp_connexe    
+#Concernant la complexité, on réalise 
 
     def connected_components_set(self):
-
         """
-
         The result should be a set of frozensets (one per component), 
-
-        For instance, for network01.in: {frozenset({1, 2, 3}), frozenset({4, 5, 6, 7})}
-
-        """
+        For instance, for network01.in: {frozenset({1, 2, 3}), frozenset({4, 5, 6, 7})        """
 
         return set(map(frozenset, self.connected_components()))
-
     
 
     def min_power(self, src, dest):
-
         """
-
-        Should return path, min_power. 
-
+        Should return path, min_power.
         """
 
         #il faut trouver une puissance qui marche
@@ -276,16 +225,16 @@ class Graph:
 
     def kruskal(self) :
         dico=self.graph
-        n=len(dico)
+       
         #trier en fonction de key sorted
-        Gf=Graph([k for k in range(0,self.nb_nodes)])
+        Gf=Graph([k for k in range(1,self.nb_nodes)])
         liste_arrete=[]
-        for i in range (self.nb_nodes) :
+        for i in range (1,self.nb_nodes) :
             for d in dico[i] :
                 (a,b,c)=d
                 if i< a :
                     liste_arrete.append((i,a,b))
-        print(liste_arrete)
+        
         liste_arrete=sorted(liste_arrete, key=lambda x : x[2])
         for arrete in liste_arrete :
             (i,a,b)=arrete
@@ -437,17 +386,105 @@ import random
 
 
 def test_kruskal() :
-    G=Graph([k for k in range (5)])
-    for k in range(5) :
+    G=Graph([k for k in range (1,5)])
+    for k in range(1,5) :
         G.add_edge(k, k+1, k)
-    G.add_edge(5, 0, 5)
+    G.add_edge(5, 1, 5)
     print (G)
     return(G.kruskal())
-def power_min_kruskal(G, src, dest) :
+def power_min_kruskal(g, src, dest) :
+    #on suppose g est couvrant
     #renvoie puissance minimale et chemin associé
-    g=kruskal(G) #on prend l'arbre couvrant associé
-    g.min_power(src, dest)
+   
+        marquage = [False for i in range(self.nb_nodes)]
+        pred=[-1 for i in range(self.nb_nodes) ]
+        def dfs_rec(s) :            
+            marquage[s-1]=True
+            for voisin in self.graph[s] :
+                (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
+                if not (marquage[i-1]) :
+                    marquage[i-1]=True
+                    pred[i-1]=s
+                    dfs_rec(i)
+        dfs_rec(src)
+        if marquage[dest-1]==False :
+            return None
+        chemin = [dest]
+        power_min=0
+        p=dest
+        while p != src :
+            p_old=p
+            p=pred[p-1]
+            chemin.append(p)
+            bool=False
+            i=0
+            while not bool :
+                (n1,n2,power,d)=g.graph[p_old][i]
+                if n1==p :
+                    bool=True
+            power_min=max(power_min, power)
+        n=len(chemin)
+        for i in range(n//2) :
+            
+            chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
+        return (chemin, power_min)
+                       
+    
 
+def temps_exec(G1, trajet, n=15) :
+    G=graph_from_file(G1)
+    
+    trajets=open(trajet)
+    line=trajets.readline().split()
+    nb=int(line[0])
+    moy=0
+    i = 0
+    trajets.close()
 
+    while i < n :
+        trajets=open(trajet)
 
+        traj=random.randint(1,nb)
+        for k in range(0, traj-1) :
+            trajets.readline()
+        
+        line=trajets.readline().split()
+                   
+        (src, dest)=(int(line[0]), int(line[1]))        
+        t0=time.perf_counter()
+        G.min_power(src, dest)
+        t=time.perf_counter()-t0
+        moy+=t
+        i+=1
+        trajets.close()  
+    print((moy/n)*float(nb)) 
+    return((moy/n)*float(nb))
+
+def temps_exec_kruskal(G1, trajet, n=15) :
+    g=graph_from_file(G1)
+    G=g.kruskal()
+    trajets=open(trajet)
+    line=trajets.readline().split()
+    nb=int(line[0])
+    moy=0
+    i = 0
+    trajets.close()
+    while i < n :
+        trajets=open(trajet)
+
+        traj=random.randint(1,nb)
+        for k in range(0, traj-1) :
+            trajets.readline()
+        
+        line=trajets.readline().split()
+                   
+        (src, dest)=(int(line[0]), int(line[1]))        
+        t0=time.perf_counter()
+        power_min_kruskal(G,src, dest)
+        t=time.perf_counter()-t0
+        moy+=t
+        i+=1
+        trajets.close()  
+    print((moy/n)*float(nb)) 
+    return((moy/n)*float(nb))
 
