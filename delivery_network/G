@@ -1,5 +1,5 @@
 graph {
-	1 -- 2
+	1 -- 2 [color=green]
 	2 -- 3
 	3 -- 4
 	2 -- 5
@@ -8,4 +8,6 @@ graph {
 	1 -- 8
 	8 -- 9
 	4 -- 10
+	1 [color=blue]
+	2 [color=blue]
 }

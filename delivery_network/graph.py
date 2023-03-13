@@ -1,42 +1,36 @@
 
-#cette classe UnionFind nous sera utile dans le td2, pour la question 3
-#elle sert à manipuler les composantes connexes efficacement et facilement
+# Cette classe UnionFind nous sera utile dans le td2, pour la question 3
+# Elle sert à manipuler les composantes connexes efficacement et facilement
+##Reste a faire les complexités de ca!!!!
 class UnionFind(object):
-    '''UnionFind Python class.'''
+    '''classe UnionFind '''
     def __init__(self, n):
+        """initialisation"""
         assert n > 0, "n doit être strictement positif"
         self.n = n
-        # cahque sommet est son propre parent au début
+        # chaque sommet est son propre parent au début
         self.parent = [i for i in range(n)]
     
     def find(self, i):
-        '''Find the parent of an element (e.g. the group it belongs to) and compress paths along the way.'''
+        '''On trouve le parent d'un élément et on remplace le chemin par le parent '''
         if self.parent[i] != i:
-            # path compression on the way to finding the final parent 
-            # (i.e. the element with a self loop)
+            # on remplace les éléments du chemin par leur parent
             self.parent[i] = self.find(self.parent[i])
         return self.parent[i]
      
-    def is_connected(self, x, y):
-        '''Check whether X and Y are connected, i.e. they have the same parent.'''
+    def connectes(self, x, y):
+        '''On vérifie si x et y sont connectés càd s'ils ont le même parent'''
         if self.find(x) == self.find(y):
             return True
         else:
             return False
     
     def union(self, x, y):
-        '''Unite the two elements by uniting their parents.'''
+        '''On unit deux éléments en réunissant leurs parents'''
         xparent = self.find(x)
         yparent = self.find(y)
         if xparent != yparent:
-            # if these elements are not yet in the same set,
-            # we will set the y parent to the x parent
-            self.parent[yparent]= xparent
-
-
-
-
-
+            self.parent[yparent] = xparent
 import queue
 import time
 import math
@@ -50,7 +44,6 @@ class Graph:
     """    A class representing graphs as adjacency lists and implementing various algorithms on the graphs. Graphs in the class are not oriented. 
     Attributes: 
     -----------
-
     nodes: NodeType
         A list of nodes. Nodes can be of any immutable type, e.g., integer, float, or string.
         We will usually use a list of integers 1, ..., n.
@@ -275,18 +268,18 @@ class Graph:
         liste_arrete=[] #on va stocker toutes les listes d'arrêtes dans un tableau
         for i in range (1,self.nb_nodes) :
             for d in dico[i] : #on parcourt chaque liste associée au sommet i
-                (a,b,c)=d #a=node2, b=power, c=dist
-                if i< a : #on ajoute les arrêtes seulement une fois dans liste_arrete
-                    liste_arrete.append((i,a,b))
+                (n2,p,dist)=d #n2 = node2, p=power, dist = distance
+                if i< n2 : #on ajoute les arrêtes seulement une fois dans liste_arrete
+                    liste_arrete.append((i,n2,p))
         
         liste_arrete=sorted(liste_arrete, key=lambda x : x[2]) #on trie la liste des arrêtes en fonction de leur power
         for arrete in liste_arrete :
-            (i,a,b)=arrete
+            (i,n2,p)=arrete 
             #On ne crée pas de cycles en rajoutant l'arrete (s1,s2) lorsque les deux sommets s1 et s2 ne sont pas dans la même composante connexe
             #si ils sont dans la même composante connexe alors en rajoutant l'arrête, on crée un cycle car alors deux chemins joignent ces sommets
-            if not uf.is_connected(i-1,a-1) : #si i et a ne sont pas dans les mêmes composantes connexes
-                Gf.add_edge(i, a, b) #on rajoute l'arrête dans le nouveau graphe
-                uf.union(i-1,a-1) # les deux sommets i et a sont maintenant dans la même composante connexe
+            if not uf.connectes(i-1,n2-1) : #si i et a ne sont pas dans les mêmes composantes connexes
+                Gf.add_edge(i, n2, p) #on rajoute l'arrête dans le nouveau graphe
+                uf.union(i-1,n2-1) # les deux sommets i et a sont maintenant dans la même composante connexe
         return Gf
     #complexité de Kruskal :
     #On fait une première boucle pour créer liste_arrete, la complexité est en O(nb_nodes)
@@ -411,6 +404,11 @@ def temps_calcul_naif(G1, trajet, n=15) :
 
 ##Question 5 du td2##
 
+
+
+
+
+
 def power_min_kruskal(g, src, dest) :
     """Renvoie  pour un trajet t=(src, dest) et g un arbre couvrant, la puissance minimale (et un chemin associé) d'un camion pouvant couvrir ce trajet"""
     # Prérequis : on suppose g est couvrant de poids minimal. 
@@ -443,6 +441,12 @@ def power_min_kruskal(g, src, dest) :
     for i in range(n//2) :            
         chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
     return (chemin, power_min)
+
+
+
+
+
+
 
 def temps_calcul_kruskal(G1, trajet, n=15) :
     """Renvoie le temps nécessaire pour calculer la puissance minimale sur l'ensemble des trajets en utilisant l'algorithme de Kruskal.
@@ -512,8 +516,6 @@ def test_kruskal() :
     for k in range(1,5) :
         G.add_edge(k, k+1, k)
         test.add_edge(k,k+1,k)
-    G.add_edge(5, 1, 5)
-    print(G.kruskal())
-    print(test)
-    return(None)
+    G.add_edge(5, 1, 5)    
+    return(G.graph==test.graph)
 #Le résultat obtenu est bien le graphe qu'on voulait avoir 
