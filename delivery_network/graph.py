@@ -407,14 +407,19 @@ def temps_calcul_naif(G1, trajet, n=15) :
 
 
 
-
-
-def power_min_kruskal(g, src, dest) :
-    """Renvoie  pour un trajet t=(src, dest) et g un arbre couvrant, la puissance minimale (et un chemin associé) d'un camion pouvant couvrir ce trajet"""
-    # Prérequis : on suppose g est couvrant de poids minimal. 
-    # Ainsi, si le chemin entre src et dest existe, il est unique
-    #on fait un parcours comme on a déjà fait précedemment
+def dfs_initial(g) :
+    """fait un dfs à partir d'une racune dans lequel on enregistre un parent et la profondeur
+    Prérequis : g est un arbre couvrant de poids minimal
+    """
+    #on va tirer parti du fait que c'est un arbre
+    #on cherche la racine, comme c'est un arbre, il y en a forcément une (sinon on aurait un cycle)
+    racine=0
+    for i in g.nodes :
+        if len(g.graph[i])==1 :
+            racine=i
+    #on fait un parcours en partant de la racine dans lequel on enregistre un parent et la profondeur
     marquage = [False for i in range(g.nb_nodes)]
+    prof=[0 for i in range(g.nb_nodes)]
     pred=[-1 for i in range(g.nb_nodes)]
     def dfs_rec(s) :            
         marquage[s-1]=True
@@ -422,25 +427,68 @@ def power_min_kruskal(g, src, dest) :
             (i,j,k)=voisin #i : noeud voisin, j puissance minimale, k distance
             if not (marquage[i-1]) :
                 marquage[i-1]=True
+                prof[i-1]=prof[s-1]+1
                 pred[i-1]=(s,j) #on stocke des couples dans le tableau de prédecesseurs pour avoir accès à la puissance de l'arrête (s,i) plus simplement
                 dfs_rec(i)
-    dfs_rec(src)
-    if marquage[dest-1]==False :
-        return None
-    chemin = [dest]
+    dfs_rec(racine)
+    return (pred, prof)
+def power_min_kruskal(g, src, dest, dfs ) :
+    """Renvoie  pour un trajet t=(src, dest) et g un arbre couvrant, la puissance minimale (et un chemin associé) d'un camion pouvant couvrir ce trajet"""
+    # Prérequis : on suppose g est couvrant de poids minimal. 
+    # Ainsi, si le chemin entre src et dest existe, il est unique
+    #on construit le chemin    
+    (pred, prof)=dfs
+    
     #on va calculer la puissance minimale nécessaire.
     #Pour cela, on construit le chemin pour aller de src à dest et on regarde le power de chaque arrête
-    #la puissance minimale vaut le max de ces puissances    
-    p=dest
+    #la puissance minimale vaut le max de ces puissances       
+    
     power_min=0
-    while p != src :
+    chemin1=[src]
+    chemin2=[dest]
+    if prof[src-1]>prof[dest-1] :
+        
+        while prof[src-1]>prof[dest-1] :
+            old=src
+            (src, p)=pred[old-1]        
+            chemin1.append(src)
+            power_min=max(p, power_min)
+            
+           
+    if prof[src-1]<prof[dest-1] :
+        
+        while prof[dest-1]>prof[src-1] :
+            old=dest
+            (dest, p)=pred[old-1]
+            chemin2.append(dest)
+            power_min=max(p, power_min) 
+            
+                 
+    #ensuite il suffit de remonter jusqu'à un ancêtre commun : la racine au pire
+    while src!=dest :
+        old1=dest
+        old2=src
+        src=pred[old1-1][0]
+        dest=pred[old2-1][0]
+        chemin1.append(src)
+        chemin2.append(dest)
+        power_min=max(pred[old1-1][1],max(pred[old2-1][1], power_min) )
+    n=len(chemin2)
+    for i in range(n//2) :     
+
+            chemin2[i],chemin2[n-1-i]=chemin2[n-1-i], chemin2[i]
+         
+    return (chemin1+ chemin2, power_min)
+
+
+    """while p != src :
         (p, power)=pred[p-1] #on prend le couple
         chemin.append(p)        
         power_min=max(power_min, power) #on regarde si power > power_min, auquel cas il faut augmenter la puissance minimale pour passer
-    n=len(chemin)
+        n=len(chemin)
     for i in range(n//2) :            
         chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
-    return (chemin, power_min)
+    return (chemin, power_min)"""
 
 
 
@@ -457,7 +505,7 @@ def temps_calcul_kruskal(G1, trajet, n=15) :
     #même principe que pour temps_calcul_naif sauf qu'on passe par l'arbre de Kruskal, pour les explications voir au-dessus
     g=graph_from_file(G1)
     G=g.kruskal() #on prend l'arbre de Kruskal
-
+    dfs=dfs_initial(G)
     trajets=open(trajet)
     line=trajets.readline().split()
     nb=int(line[0])
@@ -472,9 +520,9 @@ def temps_calcul_kruskal(G1, trajet, n=15) :
         line=trajets.readline().split()                   
         (src, dest)=(int(line[0]), int(line[1]))        
         t0=time.perf_counter()
-        power_min_kruskal(G,src, dest)
+        power_min_kruskal(G,src, dest, dfs)
         t=time.perf_counter()-t0
-        print(t)
+        
         moy+=t
         i+=1
         trajets.close()  
