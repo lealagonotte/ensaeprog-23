@@ -1,8 +1,10 @@
 
 from graph import UnionFind
-from graph import Graph, graph_from_file, temps_calcul_kruskal, power_min_kruskal, represente, dfs_initial
+from graph import Graph, graph_from_file, temps_calcul_kruskal, power_min_kruskal, represente, dfs_initial, calcul_trajets_total
 
 ##test de la question 7##
+
+
 
 """G="input/network.00.in"
 represente(G, 1, 2)
@@ -69,7 +71,7 @@ print(dfs_initial(g))
 #g=(graph_from_file("input/network.1.in").kruskal())
 #print(power_min_kruskal(g, 11, 6, dfs_initial(g)))
 ##question 5 du tp2##
-print(temps_calcul_kruskal("input/network.1.in", "input/routes.1.in"))
+"""print(temps_calcul_kruskal("input/network.1.in", "input/routes.1.in"))
 print(temps_calcul_kruskal("input/network.2.in", "input/routes.2.in"))
 print(temps_calcul_kruskal("input/network.3.in", "input/routes.3.in"))
 print(temps_calcul_kruskal("input/network.4.in", "input/routes.4.in"))
@@ -78,6 +80,7 @@ print(temps_calcul_kruskal("input/network.6.in", "input/routes.6.in"))
 print(temps_calcul_kruskal("input/network.7.in", "input/routes.7.in"))
 print(temps_calcul_kruskal("input/network.8.in", "input/routes.8.in"))
 print(temps_calcul_kruskal("input/network.9.in", "input/routes.9.in"))
+print(temps_calcul_kruskal("input/network.10.in", "input/routes.10.in"))"""
 
 #on trouve des temps beaucoup plus courts. Par exemple pour le premier, on trouve 0.002 sec
 #pour le second, on trouve environ 3h
@@ -87,3 +90,8 @@ print(temps_calcul_kruskal("input/network.9.in", "input/routes.9.in"))
 #on trouve donc des temps bien plus courts!!
 
 #print(calcul_trajets_total("input/network.2.in", "input/routes.2.in"))
+
+
+##Question 16
+for i in range (1,11) :
+    print(calcul_trajets_total(i))

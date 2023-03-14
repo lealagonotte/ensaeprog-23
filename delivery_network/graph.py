@@ -320,7 +320,7 @@ def graph_from_file(filename):
         line=f.readline().split() #on lit la ligne
         #on crée les arrêtes
         if len(line) == 4 :
-            G.add_edge(int(line[0]), int(line[1]), int(line[2]), int(line[3]))
+            G.add_edge(int(line[0]), int(line[1]), int(line[2]), line[3])
         else : 
             G.add_edge(int(line[0]), int(line[1]), int(line[2]), 1)
         #si il n'y a pas de 4ème élément dans la ligne, on met une distance égal à 1 par défaut
@@ -535,23 +535,27 @@ def temps_calcul_kruskal(G1, trajet, n=15) :
 #donc chaque tour a une complexité en O(V)
 #La complexité totale est donc O(nb_nodes) car n <<nb_nodes et en O(V) par trajet si on ne prend pas en compte la transformation en arbre couvrant
 
-
-def calcul_trajets_total(G1, trajet) :
-    g=graph_from_file(G1)
+##question 16##
+def calcul_trajets_total(n) :
+    fichier=open("input/routes."+str(n)+".out","x")
+    g=graph_from_file("input/network."+str(n)+".in")
     G=g.kruskal() #on prend l'arbre de Kruskal
-
-    trajets=open(trajet)
+    dfs=dfs_initial(G)
+    trajets=open("input/routes."+str(n)+".in")
     line=trajets.readline().split()
     nb=int(line[0]) 
-    t0=time.perf_counter()
-    for i in range(0,nb) :           
-        line=trajets.readline().split()                   
-        (src, dest)=(int(line[0]), int(line[1]))       
+    lines=trajets.readlines()
+    for line in lines :        
+        line=line.split()                 
+        (src, dest)=(int(line[0]), int(line[1]))     
         
-        power_min_kruskal(G,src, dest)
-    t=time.perf_counter()-t0        
+        (c,p)=power_min_kruskal(G,src, dest, dfs)
+        fichier.write("\n"+str(p))
+        
     trajets.close()  
-    return t
+    fichier.close()
+   
+
 
 
 ##Tests##
