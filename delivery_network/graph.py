@@ -332,7 +332,7 @@ def graph_from_file(filename):
         line=f.readline().split() #on lit la ligne
         #on crée les arrêtes
         if len(line) == 4 :
-            G.add_edge(int(line[0]), int(line[1]), int(line[2]), line[3])
+            G.add_edge(int(line[0]), int(line[1]), int(line[2]), float(line[3]))
         else : 
             G.add_edge(int(line[0]), int(line[1]), int(line[2]), 1)
         #si il n'y a pas de 4ème élément dans la ligne, on met une distance égal à 1 par défaut
