@@ -1,6 +1,9 @@
 
 from graph import UnionFind
-from graph import Graph, graph_from_file, temps_calcul_kruskal, power_min_kruskal, represente, dfs_initial, calcul_trajets_total
+from graph import Graph, graph_from_file, temps_calcul_kruskal, power_min_kruskal, represente, dfs_initial, calcul_trajets_total, test_q4
+
+### test q4
+print(test_q4())
 
 ##test de la question 7##
 
@@ -63,13 +66,13 @@ print(uf.find(9))
 ##test question4 du tp2
 #print(test_kruskal())
 
-g=(graph_from_file("input/network.1.in").kruskal())
-print(dfs_initial(g))
-
-
-
 #g=(graph_from_file("input/network.1.in").kruskal())
-#print(power_min_kruskal(g, 11, 6, dfs_initial(g)))
+#print(dfs_initial(g))
+
+
+
+g=(graph_from_file("input/network.1.in").kruskal())
+print(power_min_kruskal(g, 11, 6, dfs_initial(g)))
 ##question 5 du tp2##
 """print(temps_calcul_kruskal("input/network.1.in", "input/routes.1.in"))
 print(temps_calcul_kruskal("input/network.2.in", "input/routes.2.in"))
@@ -93,5 +96,5 @@ print(temps_calcul_kruskal("input/network.10.in", "input/routes.10.in"))"""
 
 
 ##Question 16
-for i in range (1,11) :
-    print(calcul_trajets_total(i))
+#for i in range (1,11) :
+    #print(calcul_trajets_total(i))

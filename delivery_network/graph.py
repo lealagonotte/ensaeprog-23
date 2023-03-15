@@ -1,7 +1,7 @@
 
 # Cette classe UnionFind nous sera utile dans le td2, pour la question 3
 # Elle sert à manipuler les composantes connexes efficacement et facilement
-##Reste a faire les complexités de ca!!!!
+
 class UnionFind(object):
     '''classe UnionFind '''
     def __init__(self, n):
@@ -11,12 +11,14 @@ class UnionFind(object):
         # chaque sommet est son propre parent au début
         self.parent = [i for i in range(n)]
     
+    
     def find(self, i):
         '''On trouve le parent d'un élément et on remplace le chemin par le parent '''
         if self.parent[i] != i:
             # on remplace les éléments du chemin par leur parent
             self.parent[i] = self.find(self.parent[i])
         return self.parent[i]
+        #complexité : O(n) avec n l'entier rentré en paramètres
      
     def connectes(self, x, y):
         '''On vérifie si x et y sont connectés càd s'ils ont le même parent'''
@@ -24,6 +26,7 @@ class UnionFind(object):
             return True
         else:
             return False
+        #Complexité : constante
     
     def union(self, x, y):
         '''On unit deux éléments en réunissant leurs parents'''
@@ -31,6 +34,7 @@ class UnionFind(object):
         yparent = self.find(y)
         if xparent != yparent:
             self.parent[yparent] = xparent
+    #complexité : complexité de find, linéaire 
 import queue
 import time
 import math
@@ -147,7 +151,8 @@ class Graph:
 # complexité de l'algorithme : 
 # la complexité est celle d'un parcours en profondeur 
 # Grâce au marquage, on passe au plus 1 fois par chaque sommet. 
-# Pour chaque sommet, on a une boucle for : on fait le nombre d'arrêtes dans lesquelles s est une extremité
+# Pour chaque sommet, on a une boucle for : on lit une fois toutes les arrêtes dont s est une extremité
+#on passe donc au plus une fois par chaque sommet et et pour chaque somme, on parcourt sa liste de voisins
 #La complexité est donc O(V+E) avec V le nombre de sommets et E le nombre d'arrêtes de G
 
     def connected_components(self):
@@ -171,8 +176,9 @@ class Graph:
             if marquage[noeud-1]==False :
                 comp_connexe.append(dfs_rec(noeud))
         return comp_connexe    
-#Concernant la complexité, au pire on fait nb_sommets parcours en profondeur. Or on a analysé la complexité du parcours ne profondeur au-dessus
-#Ainsi, la complexité au pire est O(V(V+E))
+#Concernant la complexité, au pire on fait nb_sommets parcours en profondeur. 
+#Avec tous les parcours, on passe exactement une fois par chaque sommet et on lit une fois toutes les arrêtes du graphe
+#Ainsi, la complexité au pire est O((V+E)) avec les mêmes notations que pour la complexité au-dessus
 
     def connected_components_set(self):
         """
@@ -213,7 +219,8 @@ class Graph:
         # à la fin de la boucle, on a ou bien b=a+1 donc power =b ou bien a=b donc power=b
         return (self.get_path_with_power(src, dest, b),b) #On renvoie la puissance minimale et le chemin associé à cette puissance
 #Complexité : Pour trouver un n tel que 2**n soit une puissance possible, on a une complexité logarithmique en power_min 
-# en effet : k=2**n equivaut à n=log_2(k)
+#Disons pour simplifier que power_min=k est une puissance de 2
+# k=2**n equivaut à n=log_2(k)
 #Ensuite, la recherche dichotomique a une complexité en O(log(2**(n-1))=O(n-1)=O(log(k)). 
 #En effet, d=2**n-2**(n-1)=2**(n-1). On divise par 2 la longueur de l'intervalle à chaque tour et 2**(n-1)/2**l=1 équivaut à l*log(2)=(n-1)log(2)
 #donc l=n-1=O(log(k))
@@ -255,6 +262,10 @@ class Graph:
 
                 chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
             return chemin
+
+##Complexité de l'algorithme de Dijkstra O((V+E)*log(E)
+
+
 ##Question 2 du td 2##
 
     
@@ -284,8 +295,9 @@ class Graph:
     #complexité de Kruskal :
     #On fait une première boucle pour créer liste_arrete, la complexité est en O(nb_nodes)
     #Ensuite, on trie la liste, dans le meilleur des cas la complexité sera en O(nlog(n)) avec n le nombre d'arrete du graphe
-    #Enfin, on fait une boucle. Il y a n tours. Chaque tour de boucle a une complexité constante car add_edge se fait en temps constant, de meme que union et is_connected avec la structure Union find
-    #POur conclure, la complexité de la fonction est O(nb_nodes + nb_edges(log(nb_edges)))
+    #Enfin, on fait une boucle. Il y a n tours. Chaque tour de boucle a une complexité O(m) avec m le nombre de noeud car add_edge, connectes se font en temps constant, 
+    # et union a une complexité linéaire en m
+    #POur conclure, la complexité de la fonction est O(nb_nodes + nb_edges(log(nb_edges)) +nb_edges*nb_nodes)
 
 
 
@@ -355,15 +367,14 @@ def represente(G, src, dest, power=20) :
     gf=open(G, "r") 
     gf.readline() #on lit la première ligne car elle n'est pas utili
     gf=gf.readlines() #on lit toutes les lignes
-    for i in range(0,len(gf)) :
-         
+    for i in range(0,len(gf)) :         
         gf[i]=gf[i].split()
         if chemin != None and int(gf[i][0]) in chemin and int(gf[i][1]) in chemin :
             g.edge(gf[i][0], gf[i][1], color="green")
         else :
             g.edge(gf[i][0], gf[i][1])
     
-    print(chemin)
+    
     if chemin is not None : 
         for node in chemin : 
             g.node(str(node), color = 'blue')
@@ -408,16 +419,20 @@ def temps_calcul_naif(G1, trajet, n=15) :
 
 
 def dfs_initial(g) :
-    """fait un dfs à partir d'une racune dans lequel on enregistre un parent et la profondeur
+    """Résultat : renvoie 2 tableaux : celui des profondeurs qui donne la profondeur de chaque noeud à partir d'une racine et celui des prédecesseurs.
     Prérequis : g est un arbre couvrant de poids minimal
+    Le fait que g soit un arbre couvrant de poids minimal garantit l'existence d'un chemin unique entre deux sommets
+    On peut également calculer la profondeur (distance à une racine) de chaque noeud et l'enregistrer, ce qui nous permettra 
+    de faire un seul parcours pour tous les trajets plutôt que de le refaire pour chaque trajet, ce qui prend du temps. 
+    Cela permet également que le parent de chaque noeud de l'arbre soit unique 
     """
     #on va tirer parti du fait que c'est un arbre
-    #on cherche la racine, comme c'est un arbre, il y en a forcément une (sinon on aurait un cycle)
+    #on cherche une racine (noeud qui n'a qu'une seule arrête), comme c'est un arbre, il y en a forcément une (sinon on aurait un cycle)
     racine=0
     for i in g.nodes :
         if len(g.graph[i])==1 :
             racine=i
-    #on fait un parcours en partant de la racine dans lequel on enregistre un parent et la profondeur
+    #on fait un parcours en profondeur en partant de la racine dans lequel on enregistre un parent et la profondeur
     marquage = [False for i in range(g.nb_nodes)]
     prof=[0 for i in range(g.nb_nodes)]
     pred=[-1 for i in range(g.nb_nodes)]
@@ -432,20 +447,26 @@ def dfs_initial(g) :
                 dfs_rec(i)
     dfs_rec(racine)
     return (pred, prof)
+    #complexité : parcours donc O(E+V). Comme on a un arbre de Kruskal E=V-1 donc O(V)
+
 def power_min_kruskal(g, src, dest, dfs ) :
     """Renvoie  pour un trajet t=(src, dest) et g un arbre couvrant, la puissance minimale (et un chemin associé) d'un camion pouvant couvrir ce trajet"""
     # Prérequis : on suppose g est couvrant de poids minimal. 
     # Ainsi, si le chemin entre src et dest existe, il est unique
-    #on construit le chemin    
+    #on récupère le tableau des parents et des profondeurs   
     (pred, prof)=dfs
     
-    #on va calculer la puissance minimale nécessaire.
+    #on va calculer la puissance minimale nécessaire pour le trajet
     #Pour cela, on construit le chemin pour aller de src à dest et on regarde le power de chaque arrête
     #la puissance minimale vaut le max de ces puissances       
     
     power_min=0
-    chemin1=[src]
+    #on va construire le chemin au fur et à mesure
+    #on crée deux chemins , un qui part de src, l'autre de dest
+    chemin1=[src] 
     chemin2=[dest]
+    #on compare les profondeurs
+    #si elles ne sont pas égales, on remonte grâce au tableau des parents jusqu'à les profondeurs soit les mêmes
     if prof[src-1]>prof[dest-1] :
         
         while prof[src-1]>prof[dest-1] :
@@ -464,33 +485,28 @@ def power_min_kruskal(g, src, dest, dfs ) :
             power_min=max(p, power_min) 
             
                  
-    #ensuite il suffit de remonter jusqu'à un ancêtre commun : la racine au pire
+    #quand les profondeurs sont les mêmes, on remonte grâce au tableau des parents jusqu'à ce qu'on arrive à un ancêtre commun
+    #qui existe (au pire, cet ancêtre est la racine)
     while src!=dest :
         old1=dest
         old2=src
         src=pred[old1-1][0]
         dest=pred[old2-1][0]
-        chemin1.append(src)
-        chemin2.append(dest)
+        if src==dest :
+            chemin1.append(src) #on l'ajoute que une fois si src=dest
+        else :
+            chemin1.append(src)
+            chemin2.append(dest)
         power_min=max(pred[old1-1][1],max(pred[old2-1][1], power_min) )
+    #on retourne chemin2 car il est à l'envers
     n=len(chemin2)
-    for i in range(n//2) :     
-
+    for i in range(n//2) : 
             chemin2[i],chemin2[n-1-i]=chemin2[n-1-i], chemin2[i]
-         
+    #on concatène les deux chemins pour avoir le chemin total     
     return (chemin1+ chemin2, power_min)
 
-
-    """while p != src :
-        (p, power)=pred[p-1] #on prend le couple
-        chemin.append(p)        
-        power_min=max(power_min, power) #on regarde si power > power_min, auquel cas il faut augmenter la puissance minimale pour passer
-        n=len(chemin)
-    for i in range(n//2) :            
-        chemin[i],chemin[n-1-i]=chemin[n-1-i], chemin[i]
-    return (chemin, power_min)"""
-
-
+#Complexité : linéaire en la profondeur des noeuds donc de la hauteur de l'arbre
+#car les seules boucles se font sur la profondeur des noeuds
 
 
 
@@ -529,45 +545,59 @@ def temps_calcul_kruskal(G1, trajet, n=15) :
    
     return((moy/n)*float(nb))
 
-#la complexité de kruskal est O(nb_nodes + nb_edges(log(nb_edges))) mais on n'en tient pas compte dans la suite
-#on a une boucle while qui fait n tours
-#Chaque tour a une complexité valant celle de power_min_kruskal qui est en O(V+E) mais comme g est couvrant E=V-1
-#donc chaque tour a une complexité en O(V)
-#La complexité totale est donc O(nb_nodes) car n <<nb_nodes et en O(V) par trajet si on ne prend pas en compte la transformation en arbre couvrant
+#la complexité de kruskal est O(nb_nodes + nb_edges(log(nb_edges)) +nb_edges*nb_nodes). On le calcule une fois au début 
+#on parcoure l'arbre une fois au début O(E+V)=O(V) car on parcourt un arbre couvrant
+#on va calculer la complexité par trajet
+#Chaque tour de boucle a une complexité valant celle de power_min_kruskal qui est linéaire en la hauteur de l'arbre
+#La complexité d'un trajet est donc un O(hauteur de l'arbre)
+#la complexité totale de l'algorithme est O(nb_nodes + nb_edges(log(nb_edges)) +nb_edges*nb_nodes+hauteur de l'arbre)
 
 ##question 16##
 def calcul_trajets_total(n) :
-    fichier=open("input/routes."+str(n)+".out","x")
+    """Crée et enregistre des fichiers "routes.i.out", tel que pour tout i, le fichier i contient la puissance minimale de chaque trajet du fichier "routes.i.in" """
+    fichier=open("input/routes."+str(n)+".out","x") #on crée le fichier
     g=graph_from_file("input/network."+str(n)+".in")
     G=g.kruskal() #on prend l'arbre de Kruskal
-    dfs=dfs_initial(G)
-    trajets=open("input/routes."+str(n)+".in")
-    line=trajets.readline().split()
+    dfs=dfs_initial(G) #on fait le parcours au début. On a juste besoin de le faire une seule fois au début
+    trajets=open("input/routes."+str(n)+".in") #on lit le fichier 
+    line=trajets.readline().split() #on lit la première ligne
     nb=int(line[0]) 
-    lines=trajets.readlines()
-    for line in lines :        
+    lines=trajets.readlines() #on lit toutes les lignes qu'on transforme en liste de str
+    for line in lines :  #on fait le calcul pour chaque trajet      
         line=line.split()                 
         (src, dest)=(int(line[0]), int(line[1]))     
         
-        (c,p)=power_min_kruskal(G,src, dest, dfs)
-        fichier.write("\n"+str(p))
+        (c,p)=power_min_kruskal(G,src, dest, dfs) #on trouve la puissance minimale
+        fichier.write("\n"+str(p)) #on l'écrit
         
-    trajets.close()  
+    trajets.close()  #on ferme
     fichier.close()
    
 
 
 
 ##Tests##
-#Ici, se trouvent tous les tests
+
 
 def test_kruskal() :
     """Teste la fonction kruskal avec un graphe qui est un cycle. Le résultat obtenu doit être le même graphe sans la dernière arrête"""
+    #on construit les deux graphes, G est le graphe sur lequel on applique kruskal et test est le graphe qu'on devrait obtenir apres 
+    # avoir appliqué Kruskal à G
     G=Graph([k for k in range (1,5)]) 
     test=Graph([k for k in range (1,5)])
     for k in range(1,5) :
         G.add_edge(k, k+1, k)
         test.add_edge(k,k+1,k)
-    G.add_edge(5, 1, 5)    
-    return(G.graph==test.graph)
+    G.add_edge(5, 1, 5) 
+
+    return(G.kruskal().graph==test.graph)
 #Le résultat obtenu est bien le graphe qu'on voulait avoir 
+
+def test_q4():
+    #on fait le test pour la question 4
+    g=graph_from_file('input/network.04.in')
+    d=int(g.graph[1][0][2])
+   
+    return (d==6 or d==89)
+
+
