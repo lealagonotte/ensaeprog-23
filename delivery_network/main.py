@@ -1,8 +1,8 @@
 
 from graph import UnionFind
-from graph import Graph, graph_from_file,temps_calcul_naif, temps_calcul_kruskal, power_min_kruskal, represente, dfs_initial, calcul_trajets_total, test_q4, test_kruskal
+from graph import Graph, graph_from_file,temps_calcul_naif, temps_calcul_kruskal, power_min_kruskal, represente, dfs_initial, calcul_trajets_total, test_q4, test_kruskal, calcul_trajets_total2, prog_dyn
 
-## test q4
+"""## test q4
 print(test_q4())
 
 ##test de la question 7##
@@ -18,7 +18,7 @@ represente(G1, 1, 3)
 
 ##Question 10 du tp2##
 print(temps_calcul_naif("input/network.1.in", "input/routes.1.in"))
-print("Avec le tp1, il faudrait " + str(temps_calcul_naif("input/network.2.in", "input/routes.2.in"))+" min pour le graphe 2")
+#print("Avec le tp1, il faudrait " + str(temps_calcul_naif("input/network.2.in", "input/routes.2.in"))+" min pour le graphe 2")
 
 #en faisant le test plusieurs fois, sur route.1.in et le graphe 1, on observe que le temps est très court (0.02 secondes)
 #Si on prend la route 2 et le graphe 2, on voit que le temps nécessaire est entre 30h et 50h. C'est beaucoup trop long!!
@@ -95,4 +95,13 @@ print("Le temps mis pour parcourir tous les trajets du graph 10 est ", temps_cal
 ##Question 16
 #on crée les fichiers
 #for i in range (1,11) :
-    #print(calcul_trajets_total(i))
+    #print(calcul_trajets_total(i))"""
+
+##question 18
+"""for i in range (1,11) :
+    print(calcul_trajets_total2(i))"""
+
+print(prog_dyn("input/network.2.in", "input/routes.2.2.out", "input/trucks.0.in"))
+
+#pas optimal
+

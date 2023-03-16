@@ -601,3 +601,98 @@ def test_q4():
     return (d==6 or d==89)
 
 
+##question 1 du td4
+#on commence par implémenter avec de la programmation dynamique type problème du sac à dos
+def calcul_trajets_total2(n) :
+    """Crée et enregistre des fichiers "routes.i.out", tel que pour tout i, le fichier i contient la puissance minimale de chaque trajet du fichier "routes.i.in" """
+    fichier=open("input/routes."+str(n)+".2.out","x") #on crée le fichier
+    g=graph_from_file("input/network."+str(n)+".in")
+    G=g.kruskal() #on prend l'arbre de Kruskal
+    dfs=dfs_initial(G) #on fait le parcours au début. On a juste besoin de le faire une seule fois au début
+    trajets=open("input/routes."+str(n)+".in") #on lit le fichier 
+    line=trajets.readline().split() #on lit la première ligne
+    nb=int(line[0])
+    fichier.write(str(nb)) 
+    lines=trajets.readlines() #on lit toutes les lignes qu'on transforme en liste de str
+    for line in lines :  #on fait le calcul pour chaque trajet      
+        line=line.split()                 
+        (src, dest, utilite)=(int(line[0]), int(line[1]), float(line[2]))     
+        
+        (c,p)=power_min_kruskal(G,src, dest, dfs) #on trouve la puissance minimale
+        fichier.write("\n"+str(p)+" "+str(utilite)) #on l'écrit
+        
+    trajets.close()  #on ferme
+    fichier.close()
+
+
+##refaire les fichier en rajoutant au debut la longueur
+
+def prog_dyn(graphe, routes, camions) :
+    """Renvoie une collection de camions, où chaque camion a une puissance p et un coùt c.
+    """
+    #les objets sont les camions
+    #commencer par calculer les utilités
+    g=graph_from_file(graphe)
+    route=open(routes)
+    
+    cam=open(camions)
+    line_c=cam.readline().split()
+    line_r=route.readline().split()
+    W=25*10**9 #contrainte budegétaire    
+    nb_c=int(line_c[0])
+    nb_r=int(line_r[0])
+    trajet=[0 for i in (nb_r)] #pas complet manque nb
+    x=[0 for i in range(nb_c)]
+    power=[0 for i in range(nb_c)]
+    lines_c=cam.readlines()
+    lines_r=route.readlines()
+    w=[0 for i in range (nb_c)]
+    utilite=[0 for i in range(nb_c)]
+    i=0
+    #on met à jours les trucs t n calcule l'utilité du camion i
+    #pour ca on parcourt le fichier trajet, on note les trajets possibles et on somme les utilite
+    for line in lines_c :
+        line=line.split()
+        u=0.0
+        w[i]=int(line[1])
+        power[i]=int(line[0])
+        j=0
+        cpt=0
+        for line2 in lines_r :
+            line2=line2.split()
+            if trajet[j]!=1 and  int(line2[0])<power[i] :
+                u+=float(line2[1])
+                trajet[j]=1
+                cpt+=1
+            j+=1
+        utilite[i]=(u,i, cpt)
+        i+=1
+
+    utilite.sort(key = lambda x :x[0], reverse=True) #on trie le tableau selon l'utilite
+    w_conso=0
+    for element in utilite :
+        (u,i, cpt)=element
+        if cpt*w[i]+w_conso <=W :
+            x[i]=cpt
+            w_conso+=w[i]*cpt
+        else :
+            x[i]=0
+    return x
+    
+
+
+
+
+
+    
+   
+    
+    
+  
+
+
+
+    
+
+
+
