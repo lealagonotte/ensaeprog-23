@@ -673,12 +673,13 @@ def prog_dyn(graphe, routes, camions) :
     #on definit l'efficacite
     efficacite=[]
     for j in range(len(utilite)) :
-        efficacite.append((utilite[j][0]/w[j], i, cpt))
+        efficacite.append((utilite[j][0]/w[j], utilite[j][1], utilite[j][2]))
     efficacite.sort(key = lambda x :x[0], reverse=True) #on trie le tableau selon l'utilite
     w_conso=0 #inférieur a la CB?
     
     for element in efficacite :
         (u,i, cpt)=element
+    
         if cpt*w[i]+w_conso <=W :
             x[i]=cpt
             w_conso+=w[i]*cpt
@@ -695,6 +696,55 @@ def prog_dyn(graphe, routes, camions) :
 #ensuite, on regarde pour chaque trajet le camion le moins cher qui peut faire ce trajet
 #on met a jour le budget
 #on sarrete quand le budhget vaut 0
+def enleve_camion_inutile(fichier_camion ) :
+    return None
+
+def convert_to_list(fichier) :
+    f=open(fichier)
+    liste=f.readlines()
+    tab=[]
+    for line in lines :
+        line=line.split()
+        for j in 
+
+        
+def prog_dyn2(camion, trajet, graphe):
+    """
+    on convertit, c des fichiers de base
+    camion est une liste de tuples de la forme (a,b,i) avec a puissance, b prix, i le numero du camion
+    trajet c pareil avec a puissance min et b utilite
+
+    """
+    camion=convert_to_list(fichier)
+    W=25*10**9
+    camion.sort(key=lambda x: x[1])
+    camions=[-1 for i in range(len(trajet))]#indique quel camion on prend pour le trajet i
+    i=0
+    prix_total=0
+    trajet.sort(key=lambda x : x[1], reverse=True)
+
+    for element in trajet :
+        (power, cout)=element
+        #on cherche le camion dont le prix est le moins cher
+
+        for cam in camion :
+            (a,b,i)=cam
+            if prix_total +b>W :
+                break
+            if  a > power :
+                camions[i]= cam
+                prix_total+=b
+        
+        i+=1
+        counts=[]
+        for k in cam :
+            c=camions.count(k)
+            counts.append((k,c))
+        return counts
+
+
+
+
 
 
     
