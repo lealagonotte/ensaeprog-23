@@ -1,7 +1,7 @@
 
 # Cette classe UnionFind nous sera utile dans le td2, pour la question 3
 # Elle sert à manipuler les composantes connexes efficacement et facilement
-
+import numpy as np
 class UnionFind(object):
     '''classe UnionFind '''
     def __init__(self, n):
@@ -626,28 +626,31 @@ def calcul_trajets_total2(n) :
 
 
 ##refaire les fichier en rajoutant au debut la longueur
-
+#laisser l'utilite aussi
+#plus rapide mais moins exacte que si on voit les trajets comme les objects
+#penser a trier les elements en fontion de leur prix
+#pas optimal
 def prog_dyn(graphe, routes, camions) :
     """Renvoie une collection de camions, où chaque camion a une puissance p et un coùt c.
     """
     #les objets sont les camions
     #commencer par calculer les utilités
     g=graph_from_file(graphe)
-    route=open(routes)
-    
+    route=open(routes)    
     cam=open(camions)
     line_c=cam.readline().split()
     line_r=route.readline().split()
     W=25*10**9 #contrainte budegétaire    
     nb_c=int(line_c[0])
     nb_r=int(line_r[0])
-    trajet=[0 for i in (nb_r)] #pas complet manque nb
+    trajet=[0 for i in range (nb_r)] #pas complet manque nb
     x=[0 for i in range(nb_c)]
     power=[0 for i in range(nb_c)]
     lines_c=cam.readlines()
     lines_r=route.readlines()
-    w=[0 for i in range (nb_c)]
-    utilite=[0 for i in range(nb_c)]
+    w=[0 for i in range(nb_c)]#cout 
+    utilite=[0 for i in range(nb_c)]#utilie
+
     i=0
     #on met à jours les trucs t n calcule l'utilité du camion i
     #pour ca on parcourt le fichier trajet, on note les trajets possibles et on somme les utilite
@@ -660,17 +663,21 @@ def prog_dyn(graphe, routes, camions) :
         cpt=0
         for line2 in lines_r :
             line2=line2.split()
-            if trajet[j]!=1 and  int(line2[0])<power[i] :
+            if trajet[j]!=1 and  int(line2[0])<=power[i] :
                 u+=float(line2[1])
                 trajet[j]=1
                 cpt+=1
             j+=1
         utilite[i]=(u,i, cpt)
         i+=1
-
-    utilite.sort(key = lambda x :x[0], reverse=True) #on trie le tableau selon l'utilite
-    w_conso=0
-    for element in utilite :
+    #on definit l'efficacite
+    efficacite=[]
+    for j in range(len(utilite)) :
+        efficacite.append((utilite[j][0]/w[j], i, cpt))
+    efficacite.sort(key = lambda x :x[0], reverse=True) #on trie le tableau selon l'utilite
+    w_conso=0 #inférieur a la CB?
+    
+    for element in efficacite :
         (u,i, cpt)=element
         if cpt*w[i]+w_conso <=W :
             x[i]=cpt
@@ -679,9 +686,15 @@ def prog_dyn(graphe, routes, camions) :
             x[i]=0
     return x
     
+#https://complex-systems-ai.com/algorithmique/algorithme-naif-glouton-enumeration/
 
 
-
+# on commence par enleve les camions qu servent a rien
+# a la fin il doit en rester 185 pour trucks2 par ex
+#ensuite on trie les camions par prix decroissants
+#ensuite, on regarde pour chaque trajet le camion le moins cher qui peut faire ce trajet
+#on met a jour le budget
+#on sarrete quand le budhget vaut 0
 
 
     

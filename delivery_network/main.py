@@ -101,7 +101,7 @@ print("Le temps mis pour parcourir tous les trajets du graph 10 est ", temps_cal
 """for i in range (1,11) :
     print(calcul_trajets_total2(i))"""
 
-print(prog_dyn("input/network.2.in", "input/routes.2.2.out", "input/trucks.0.in"))
+print(prog_dyn("input/network.5.in", "input/routes.5.2.out", "input/trucks.0.in"))
 
 #pas optimal
 
