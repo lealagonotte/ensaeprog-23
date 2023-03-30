@@ -741,8 +741,7 @@ def prog_dyn2(camion, trajet, graphe):
             c=camions.count(k)
             counts.append((k,c))
         return counts
-
-
+#methode heuristique : en gros tu regardes les trajets qui ameliorent l'utilite zet tu changes les trucs si c vraiment mieux, cf tipe lais faut ameliorer
 
 
 
