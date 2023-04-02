@@ -630,6 +630,11 @@ def calcul_trajets_total2(n) :
 #plus rapide mais moins exacte que si on voit les trajets comme les objects
 #penser a trier les elements en fontion de leur prix
 #pas optimal
+
+
+
+
+#on adapte le problème du sac à dos. On commence par une méthode gloutonne
 def prog_dyn(graphe, routes, camions) :
     """Renvoie une collection de camions, où chaque camion a une puissance p et un coùt c.
     """
@@ -696,52 +701,74 @@ def prog_dyn(graphe, routes, camions) :
 #ensuite, on regarde pour chaque trajet le camion le moins cher qui peut faire ce trajet
 #on met a jour le budget
 #on sarrete quand le budhget vaut 0
-def enleve_camion_inutile(fichier_camion ) :
+def enleve_camion_inutile(liste_camion ) :
+    """un camion est inutile si il coûte plus cher et a une puissance inférieur à celle d'un autre"""
     return None
 
-def convert_to_list(fichier) :
+def convert_to_list(fichier, bool) :
+
     f=open(fichier)
+    l1=f.readline().split()
+    cpt=0
     liste=f.readlines()
     tab=[]
-    for line in lines :
+    for line in liste :
+        l=[]
         line=line.split()
-        for j in 
+        
+        for j in line :
+            
+            l.append(float(j))
+        if not bool :
+            l.append(cpt)
+            cpt+=1
+        tab.append(l)
+    f.close()
+    return tab
+
+
 
         
-def prog_dyn2(camion, trajet, graphe):
+def prog_dyn2(graphe, trajet, camion):
     """
     on convertit, c des fichiers de base
     camion est une liste de tuples de la forme (a,b,i) avec a puissance, b prix, i le numero du camion
     trajet c pareil avec a puissance min et b utilite
 
     """
-    camion=convert_to_list(fichier)
+    camion=convert_to_list(camion, False)
+    trajet=convert_to_list(trajet,  True)
     W=25*10**9
     camion.sort(key=lambda x: x[1])
     camions=[-1 for i in range(len(trajet))]#indique quel camion on prend pour le trajet i
-    i=0
+    j=0
     prix_total=0
     trajet.sort(key=lambda x : x[1], reverse=True)
-
-    for element in trajet :
+    
+    for element in trajet : #on parcourt tous les trajets
         (power, cout)=element
         #on cherche le camion dont le prix est le moins cher
 
-        for cam in camion :
+        for cam in camion : #on parcourt tous les camions
             (a,b,i)=cam
-            if prix_total +b>W :
+            if prix_total +b>W : #on regarde si le prix total + le nv prix depasse la cb
                 break
-            if  a > power :
-                camions[i]= cam
+            if  a > power : 
+                camions[j]= i #pour le trajer j on prend le camion i
                 prix_total+=b
-        
-        i+=1
-        counts=[]
-        for k in cam :
-            c=camions.count(k)
+            print(prix_total) #on augement le prix paye
+        j+=1 #on change de trajet
+    
+    counts=[]
+    for elmt in camion :
+        (a,b,k)=elmt
+        c=camions.count(k)
+        if c!=0 :
             counts.append((k,c))
-        return counts
+
+    return counts
 #methode heuristique : en gros tu regardes les trajets qui ameliorent l'utilite zet tu changes les trucs si c vraiment mieux, cf tipe lais faut ameliorer
+
 
 
 
