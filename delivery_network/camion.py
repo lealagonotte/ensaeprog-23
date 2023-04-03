@@ -601,8 +601,8 @@ def test_q4():
     return (d==6 or d==89)
 
 
-##question 18 du td4
-
+##question 1 du td4
+#on commence par implémenter avec de la programmation dynamique type problème du sac à dos
 def calcul_trajets_total2(n) :
     """Crée et enregistre des fichiers "routes.i.out", tel que pour tout i, le fichier i contient la puissance minimale de chaque trajet du fichier "routes.i.in" """
     fichier=open("input/routes."+str(n)+".2.out","x") #on crée le fichier
@@ -625,16 +625,23 @@ def calcul_trajets_total2(n) :
     fichier.close()
 
 
-##Première idée
-#ici on voit les camions comme les objets. On définit alors camions comme étant l'équivalent des objets du problème du sac à dos.
-#  On définit alors une utilité qui est la somme des utilités des trajets que le camion peut faire
-#il faut trier les camions par prix 
-#il semblerait que cette façon de faire ne donne pas du tout les bons résultats puisqu'en fait c toujours le premier camion qui prend qui 
-#a une utilité beaucoup plus grande et donc qu'on prend beaucoup
+##refaire les fichier en rajoutant au debut la longueur
+#laisser l'utilite aussi
+#plus rapide mais moins exacte que si on voit les trajets comme les objects
+#penser a trier les elements en fontion de leur prix
+#pas optimal
+
+
+
+
+#on adapte le problème du sac à dos. On commence par une méthode gloutonne
+#cependant, il selbkerait que cette méthode ne donne pas du tt de bons résultats
+#notre première idee etait de 
 def prog_dyn(graphe, routes, camions) :
     """Renvoie une collection de camions, où chaque camion a une puissance p et un coùt c.
     """
-  
+    #marche pas trop car en gros on garde surtout le repmier cam, a voir si en triant par le pouds decroissant c mieux
+    #les objets sont les camions
     #commencer par calculer les utilités
     g=graph_from_file(graphe)
     route=open(routes)    
@@ -699,14 +706,20 @@ def prog_dyn(graphe, routes, camions) :
     cam.close()
     return x
     
+#https://complex-systems-ai.com/algorithmique/algorithme-naif-glouton-enumeration/
 
+
+# on commence par enleve les camions qu servent a rien
+# a la fin il doit en rester 185 pour trucks2 par ex
+#ensuite on trie les camions par prix decroissants
+#ensuite, on regarde pour chaque trajet le camion le moins cher qui peut faire ce trajet
+#on met a jour le budget
+#on sarrete quand le budhget vaut 0
 
 
 
 def enleve_camion_inutile(liste_camion ) :
-    """un camion est inutile si il coûte plus cher et a une puissance inférieur à celle d'un autre
-    Résultat : On renvoie une liste dans laquelle les camions qui ne servent à rien ont été retirés
-    """
+    """un camion est inutile si il coûte plus cher et a une puissance inférieur à celle d'un autre"""
     camion=convert_to_list(liste_camion, True)
     camion_utile=[]
     for element in camion :
@@ -719,7 +732,7 @@ def enleve_camion_inutile(liste_camion ) :
         if not bool :
             camion_utile.append(element)
     return camion_utile
-    #Complexité : O(nb_c**2) avec nb_c le nombre de camions
+    #en realite la complexité est pas optimale car on a pas besoin de tout reparcourir
 
 
 
@@ -746,11 +759,10 @@ def convert_to_list(fichier, bool) :
         tab.append(l)
     f.close()
     return tab
-    #la complexité de la fonction est O(len(liste))
+    #la complexité de la fonction est
 
 
-
-#deuxième idée,        
+        
 def glouton(graphe, trajet, camion):
     """
     Idée : on trie les trajets en fonction de leur utilité. On trie les camions en fonction de leur poids. 
@@ -759,13 +771,9 @@ def glouton(graphe, trajet, camion):
 
     Complexité : C(convert_to_list(trajet))+ C(convert_to_list(camion)) + C(camion.sort())+C(trajet.sort())+O(len(trajet)*len(camion)+
   O(len(camion)*len(camion)) car on suppose que la fonction count est implementée de telle sorte à ce que la complexité soit linéaire en la taille de la liste
-  donc en supposant que C(l.sort())=len(l)*ln(len(l))  et avec nb_t=nombre de trajet et nb_c nombre de camion
-  complexité = O(nb_t + nb_c**2)+ O(nb_t*log(nb_t)+nb_r*log(nb_r)+O(nb_t*nb_c))
-  soit O(nb_c**2+nb_t*log(nb_t)+nb_t*nb_c)
-  La complexité d'un algorithme glouton du sac à dos classique est O(nlog(n)) si la liste n'est pas triée
-
+  donc en supposant que C(l.sort())=len(l)*ln(len(l))
     Paramètres :
-    camion est fichier qu'on transforme en une liste de tuples de la forme (a,b,i) avec a puissance, b prix, i le numero du camion
+    camion est une liste de tuples de la forme (a,b,i) avec a puissance, b prix, i le numero du camion
     trajet idem avec a puissance min et b utilite
 
     """
@@ -801,10 +809,7 @@ def glouton(graphe, trajet, camion):
     return counts
 
 def algo_naif(graphe, trajet, camions) :
-    """on teste toutes les possibilités, on est sur d'avoir la possibilité optimale
-    mais le complexité va être très grande"""
-    
-
+    """on teste toutes les possibilités, on est sur d'avoir la possibilité optimale"""
 
 
 

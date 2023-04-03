@@ -1,5 +1,5 @@
 
-from graph import UnionFind, convert_to_list, prog_dyn2
+from graph import UnionFind, convert_to_list, glouton, enleve_camion_inutile
 from graph import Graph, graph_from_file,temps_calcul_naif, temps_calcul_kruskal, power_min_kruskal, represente, dfs_initial, calcul_trajets_total, test_q4, test_kruskal, calcul_trajets_total2, prog_dyn
 
 """## test q4
@@ -100,8 +100,8 @@ print("Le temps mis pour parcourir tous les trajets du graph 10 est ", temps_cal
 ##question 18
 """for i in range (1,11) :
     print(calcul_trajets_total2(i))"""
-print(prog_dyn2("input/network.5.in", "input/routes.5.2.out", "input/trucks.1.in"))
-
+#print(glouton("input/network.5.in", "input/routes.5.2.out", "input/trucks.1.in"))
+#print(prog_dyn("input/network.2.in", "input/routes.2.2.out", "input/trucks.1.in"))
 #pas optimal
-
+print(enleve_camion_inutile("input/trucks.2.in"))
 #print(convert_to_list("input/routes.5.2.out", False))
