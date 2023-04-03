@@ -787,7 +787,7 @@ def glouton(graphe, trajet, camion):
             if prix_total +b>W : #on regarde si le prix total + le nv prix depasse la cb
                 break
             if  a > power : 
-                camions[j]= i #pour le trajer j on prend le camion i
+                camions[j]= i #pour le trajet j on prend le camion i
                 prix_total+=b
             print(prix_total) #on augement le prix paye
         j+=1 #on change de trajet
@@ -799,11 +799,52 @@ def glouton(graphe, trajet, camion):
         if c!=0 :
             counts.append((k,c))
     return counts
-
+import itertools
 def algo_naif(graphe, trajet, camions) :
     """on teste toutes les possibilités, on est sur d'avoir la possibilité optimale
-    mais le complexité va être très grande"""
-    
+    mais le complexité va être très grande (on teste 2**n possibilités avec n=len(trajet))
+     Paramètres :
+    camion est fichier qu'on transforme en une liste de tuples de la forme (a,b,i) avec a puissance, b prix, i le numero du camion
+    trajet idem : on le transforme en liste de [a,b] avec a puissance min et b utilite
+    """
+    #en gros, on teste toutes les possibilités
+    camion=convert_to_list(camion, False)
+    trajet=convert_to_list(trajet,  False)
+    n = len(trajet)
+    camion.sort(key=lambda x: x[1])
+        
+    best_utilite = 0
+    best_att = []
+    for j in range(0, len(trajet)) :
+        for i in itertools.combinations(trajet , j ): #en gros on a 2**n choix car pour chaque trajet, on peut choisir de le prendre ou pas 
+    #du coup, on regarde le camion le plus intéressant à prendre pour chaque trajet comme on a fait avant
+    #on va donc chercher la meilleure utilité dans les 2**n cas
+            camions=[-1 for _ in range(len(trajet))]
+            
+            utilite=0
+            for element in i :
+                for cam in camion : #on parcourt tous les camions
+                    (a,b,j)=cam
+                    if prix_total +b>W : #on regarde si le prix total + le nv prix depasse la cb
+                        break
+                    if  a > power : 
+                        camions[element[2]]= j #pour le trajet element[2] on prend le camion j
+                        prix_total+=b
+                utilite+=element[1]     
+            if utilite > best_utilite :
+                best_utilite=utilite  
+                best_att=i
+    return best_att, best_utilite                
+
+        
+        
+        
+        
+        
+        
+        
+      
+
 
 
 
