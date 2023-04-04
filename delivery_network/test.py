@@ -68,3 +68,9 @@ def test_q4():
     d=int(g.graph[1][0][2])
    
     return (d==6 or d==89)
+
+
+
+## test question 18
+
+#test de algo_naif sur un petit graphe
