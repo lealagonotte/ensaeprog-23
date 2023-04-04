@@ -800,6 +800,9 @@ def glouton(graphe, trajet, camion):
             counts.append((k,c))
     return counts
 import itertools
+
+
+
 def algo_naif(graphe, trajet, camions) :
     """on teste toutes les possibilités, on est sur d'avoir la possibilité optimale
     mais le complexité va être très grande (on teste 2**n possibilités avec n=len(trajet))
@@ -808,11 +811,11 @@ def algo_naif(graphe, trajet, camions) :
     trajet idem : on le transforme en liste de [a,b] avec a puissance min et b utilite
     """
     #en gros, on teste toutes les possibilités
-    camion=convert_to_list(camion, False)
+    camion=convert_to_list(camions, False)
     trajet=convert_to_list(trajet,  False)
     n = len(trajet)
     camion.sort(key=lambda x: x[1])
-        
+    W=25*10**9    
     best_utilite = 0
     best_att = []
     for j in range(0, len(trajet)) :
@@ -820,14 +823,14 @@ def algo_naif(graphe, trajet, camions) :
     #du coup, on regarde le camion le plus intéressant à prendre pour chaque trajet comme on a fait avant
     #on va donc chercher la meilleure utilité dans les 2**n cas
             camions=[-1 for _ in range(len(trajet))]
-            
+            prix_total=0
             utilite=0
             for element in i :
                 for cam in camion : #on parcourt tous les camions
                     (a,b,j)=cam
                     if prix_total +b>W : #on regarde si le prix total + le nv prix depasse la cb
                         break
-                    if  a > power : 
+                    if  a > element[0] : 
                         camions[element[2]]= j #pour le trajet element[2] on prend le camion j
                         prix_total+=b
                 utilite+=element[1]     
